@@ -172,16 +172,56 @@ void mezclarCadena(char cad[]) {
     }
 }
 
-int leerArchivo(const char *nombre, char *buffer, int max) {
-    FILE *f = fopen(nombre, "r");
-    if (!f) return 0;
+int leerArchivo(const char *nombre, char *buffer, int max)
+{
+    char modoLectura[] = "r";
+    int n;
+    FILE *f;
 
-    int n = fread(buffer, 1, max-1, f);
-    buffer[n] = 0; 
+    __asm {
+        ; f = fopen(nombre, "r")
+        push offset modoLectura
+        push nombre
+        call fopen
+        add esp, 8
+        mov f, eax
 
-    fclose(f);
+        ; if (!f) return 0
+        test eax, 0
+        jnz archivo_ok
+        cmp eax, 0
+        mov n, eax
+        jmp fin
+
+    archivo_ok:
+
+        ; n = fread(buffer, 1, max-1, f)
+        mov eax, max
+        dec eax
+        push f
+        push eax
+        push 1
+        push buffer
+        call fread
+        add esp, 16
+        mov n, eax
+
+        ; buffer[n] = '\0'
+        mov edx, buffer
+        add edx, eax
+        mov byte ptr [edx], 0
+
+        ; fclose(f)
+        push f
+        call fclose
+        add esp, 4
+
+    fin:
+    }
+
     return n;
 }
+
 
 
 
