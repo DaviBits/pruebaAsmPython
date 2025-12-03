@@ -575,10 +575,226 @@ static void (*_cffi_call_python_org)(struct _cffi_externpy_s *, char *);
 /************************************************************/
 
 static void *_cffi_types[] = {
-/*  0 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // int()(int)
-/*  1 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7), // int
+/*  0 */ _CFFI_OP(_CFFI_OP_FUNCTION, 12), // int()(char *)
+/*  1 */ _CFFI_OP(_CFFI_OP_POINTER, 8), // char *
 /*  2 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/*  3 */ _CFFI_OP(_CFFI_OP_FUNCTION, 12), // int()(char *, char *)
+/*  4 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/*  5 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/*  6 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/*  7 */ _CFFI_OP(_CFFI_OP_FUNCTION, 12), // int()(char, char *)
+/*  8 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2), // char
+/*  9 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 10 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 11 */ _CFFI_OP(_CFFI_OP_FUNCTION, 12), // int()(int)
+/* 12 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7), // int
+/* 13 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 14 */ _CFFI_OP(_CFFI_OP_FUNCTION, 19), // void()(char *)
+/* 15 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 16 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 17 */ _CFFI_OP(_CFFI_OP_FUNCTION, 19), // void()(void)
+/* 18 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 19 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
 };
+
+static int _cffi_d_charInCad(char x0, char * x1)
+{
+  return charInCad(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_charInCad(PyObject *self, PyObject *args)
+{
+  char x0;
+  char * x1;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  int result;
+  PyObject *pyresult;
+  PyObject *arg0;
+  PyObject *arg1;
+
+  if (!PyArg_UnpackTuple(args, "charInCad", 2, 2, &arg0, &arg1))
+    return NULL;
+
+  x0 = (char)_cffi_to_c_char(arg0);
+  if (x0 == (char)-1 && PyErr_Occurred())
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg1, (char **)&x1);
+  if (datasize != 0) {
+    x1 = ((size_t)datasize) <= 640 ? (char *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(1), arg1, (char **)&x1,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = charInCad(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  pyresult = _cffi_from_c_int(result, int);
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  return pyresult;
+}
+#else
+#  define _cffi_f_charInCad _cffi_d_charInCad
+#endif
+
+static int _cffi_d_cmpCad(char * x0, char * x1)
+{
+  return cmpCad(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_cmpCad(PyObject *self, PyObject *args)
+{
+  char * x0;
+  char * x1;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  int result;
+  PyObject *pyresult;
+  PyObject *arg0;
+  PyObject *arg1;
+
+  if (!PyArg_UnpackTuple(args, "cmpCad", 2, 2, &arg0, &arg1))
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    x0 = ((size_t)datasize) <= 640 ? (char *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(1), arg0, (char **)&x0,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg1, (char **)&x1);
+  if (datasize != 0) {
+    x1 = ((size_t)datasize) <= 640 ? (char *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(1), arg1, (char **)&x1,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = cmpCad(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  pyresult = _cffi_from_c_int(result, int);
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  return pyresult;
+}
+#else
+#  define _cffi_f_cmpCad _cffi_d_cmpCad
+#endif
+
+static void _cffi_d_init_rand_seed(void)
+{
+  init_rand_seed();
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_init_rand_seed(PyObject *self, PyObject *noarg)
+{
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { init_rand_seed(); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  (void)noarg; /* unused */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_init_rand_seed _cffi_d_init_rand_seed
+#endif
+
+static int _cffi_d_lenCad(char * x0)
+{
+  return lenCad(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_lenCad(PyObject *self, PyObject *arg0)
+{
+  char * x0;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  int result;
+  PyObject *pyresult;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    x0 = ((size_t)datasize) <= 640 ? (char *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(1), arg0, (char **)&x0,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = lenCad(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  pyresult = _cffi_from_c_int(result, int);
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  return pyresult;
+}
+#else
+#  define _cffi_f_lenCad _cffi_d_lenCad
+#endif
+
+static void _cffi_d_mezclarCadena(char * x0)
+{
+  mezclarCadena(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_mezclarCadena(PyObject *self, PyObject *arg0)
+{
+  char * x0;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg0, (char **)&x0);
+  if (datasize != 0) {
+    x0 = ((size_t)datasize) <= 640 ? (char *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(1), arg0, (char **)&x0,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { mezclarCadena(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_mezclarCadena _cffi_d_mezclarCadena
+#endif
 
 static int _cffi_d_rnd(int x0)
 {
@@ -611,7 +827,12 @@ _cffi_f_rnd(PyObject *self, PyObject *arg0)
 #endif
 
 static const struct _cffi_global_s _cffi_globals[] = {
-  { "rnd", (void *)_cffi_f_rnd, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 0), (void *)_cffi_d_rnd },
+  { "charInCad", (void *)_cffi_f_charInCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 7), (void *)_cffi_d_charInCad },
+  { "cmpCad", (void *)_cffi_f_cmpCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 3), (void *)_cffi_d_cmpCad },
+  { "init_rand_seed", (void *)_cffi_f_init_rand_seed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 17), (void *)_cffi_d_init_rand_seed },
+  { "lenCad", (void *)_cffi_f_lenCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 0), (void *)_cffi_d_lenCad },
+  { "mezclarCadena", (void *)_cffi_f_mezclarCadena, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 14), (void *)_cffi_d_mezclarCadena },
+  { "rnd", (void *)_cffi_f_rnd, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 11), (void *)_cffi_d_rnd },
 };
 
 static const struct _cffi_type_context_s _cffi_type_context = {
@@ -621,12 +842,12 @@ static const struct _cffi_type_context_s _cffi_type_context = {
   NULL,  /* no struct_unions */
   NULL,  /* no enums */
   NULL,  /* no typenames */
-  1,  /* num_globals */
+  6,  /* num_globals */
   0,  /* num_struct_unions */
   0,  /* num_enums */
   0,  /* num_typenames */
   NULL,  /* no includes */
-  3,  /* num_types */
+  20,  /* num_types */
   0,  /* flags */
 };
 

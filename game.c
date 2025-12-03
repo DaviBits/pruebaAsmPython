@@ -1,22 +1,35 @@
 
 
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>   
+static unsigned int global_seed = 0;
+int rnd(int max);
+int cmpCad(char cad1[], char cad2[]);
+int charInCad(char car, char cad[]);
+int lenCad(char cad[]);
+void mezclarCadena(char cad[]);
+void init_rand_seed();
+
+void init_rand_seed() {
+    global_seed = (unsigned int)time(NULL) ^ (unsigned int)getpid();
+}
 
 int rnd(int max){
     int selected = 0;
-    static unsigned int seed = 12345678;
-
+    
     __asm{
-        mov eax, seed
+        mov eax, global_seed
         imul eax, 1664525
         add eax, 1013904223
-        mov seed, eax
+        mov global_seed, eax 
 
-        mov ecx, max      ; <<< ESTA ES LA MANERA CORRECTA EN MSVC
+        mov ecx, max
         mov edx, 0
-        div ecx
-
+        div ecx           
+        
         mov selected, edx
+        
     }
 
     return selected;
@@ -113,31 +126,57 @@ int lenCad(char cad[]) {
     return len;
 }
 
+
+
+
 void mezclarCadena(char cad[]) {
     __asm {
-        mov esi, cad
-        mov ecx, len
-        dec ecx
+        push esi
+        push edi
+        push ebx
 
-        loop_fy:
-            mov ebx, ecx
+        mov esi, cad
+
+        ; obtener longitud : lenCad(cad)
+        push cad
+        call lenCad
+        add esp, 4; limpiar argumento
+        mov ecx, eax; ecx = longitud
+        dec ecx; ecx = longitud - 1
+
+        cmp ecx, 0
+        jl mez_end
+
+        mez_loop :
+        mov ebx, ecx
             inc ebx
 
+            push ecx
             push ebx
             call rnd
             add esp, 4
-
-            mov edi, eax 
+            pop ecx
+            mov edi, eax
 
             mov al, [esi + ecx]
             mov bl, [esi + edi]
-
-            mov [esi + ecx], bl
-            mov [esi + edi], al
+            mov[esi + ecx], bl
+            mov[esi + edi], al
 
             dec ecx
-            jns loop_fy
+            cmp ecx, 0
+            jge mez_loop
+
+            mez_end :
+        pop ebx
+            pop edi
+            pop esi
     }
 }
+
+
+
+
+
 
 
