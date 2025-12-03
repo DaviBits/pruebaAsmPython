@@ -1,5 +1,3 @@
-
-
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>   
@@ -10,6 +8,8 @@ int charInCad(char car, char cad[]);
 int lenCad(char cad[]);
 void mezclarCadena(char cad[]);
 void init_rand_seed();
+void obtenerLineaRandom(char *buffer, char *out);
+int leerArchivo(const char *nombre, char *buffer, int max);
 
 void init_rand_seed() {
     global_seed = (unsigned int)time(NULL) ^ (unsigned int)getpid();
@@ -25,16 +25,14 @@ int rnd(int max){
         mov global_seed, eax 
 
         mov ecx, max
-        mov edx, 0
-        div ecx           
-        
+        mov edx, 0       ; ← FIX IMPORTANTE
+        div ecx            ; edx = eax % max
+
         mov selected, edx
-        
     }
 
     return selected;
 }
-
 int cmpCad(char cad1[], char cad2[]) { 
     int esLaMisma = 1;
 
@@ -174,9 +172,122 @@ void mezclarCadena(char cad[]) {
     }
 }
 
+int leerArchivo(const char *nombre, char *buffer, int max) {
+    FILE *f = fopen(nombre, "r");
+    if (!f) return 0;
+
+    int n = fread(buffer, 1, max-1, f);
+    buffer[n] = 0; 
+
+    fclose(f);
+    return n;
+}
 
 
 
+void obtenerLineaRandom(char *buffer, char *out) {
+    __asm {
+        mov esi, buffer
+        mov edi, out
+        xor ecx, ecx               ; ECX = contador de saltos '\n'
 
+    ; ============================
+    ; CONTAR LÍNEAS
+    ; ============================
+    contar_lineas:
+        mov al, [esi]
+        cmp al, 0
+        je fin_conteo              ; fin del buffer
 
+        cmp al, 0Ah                ; si es '\n'
+        jne seguir_contar
+        inc ecx                    ; contamos un salto → una línea
+
+    seguir_contar:
+        inc esi
+        jmp contar_lineas
+
+    fin_conteo:
+        inc ecx                    ; total líneas = saltos+1
+
+        ; generar índice aleatorio en [0, ecx-1]
+        push ecx
+        call rnd
+        add esp, 4
+        mov ebx, eax               ; EBX = línea objetivo
+
+        mov esi, buffer
+
+    ; ============================
+    ; BUSCAR INICIO DE LA LÍNEA SELECCIONADA
+    ; ============================
+    buscar_linea:
+        cmp ebx, 0
+        je copiar_linea
+
+        mov al, [esi]
+        cmp al, 0
+        je copiar_linea            ; EOF inesperado
+
+        cmp al, 0Ah
+        jne avanzar_busqueda
+        dec ebx                    ; llegó a un salto → próxima línea
+
+    avanzar_busqueda:
+        inc esi
+        jmp buscar_linea
+
+    ; ============================
+    ; COPIAR LA LÍNEA (ignorando '\r')
+    ; ============================
+    copiar_linea:
+        mov al, [esi]
+        cmp al, 0
+        je fin
+
+        cmp al, 0Ah                ; fin de la línea
+        je fin
+
+        cmp al, 0Dh                ; ignorar '\r'
+        je ignorar_cr
+
+        mov [edi], al              ; copiar caracter
+        inc edi
+
+    ignorar_cr:
+        inc esi
+        jmp copiar_linea
+
+    fin:
+        mov byte ptr [edi], 0      ; terminador
+    }
+}
+
+int contarLineas(char *buffer) {
+    int total = 0;
+
+    __asm {
+        mov esi, buffer
+        xor ecx, ecx    ; contador de saltos '\n' = 0
+
+    cl_loop:
+        mov al, [esi]
+        cmp al, 0
+        je cl_fin
+
+        cmp al, 0Ah     ; '\n'
+        jne cl_next
+        inc ecx
+
+    cl_next:
+        inc esi
+        jmp cl_loop
+
+    cl_fin:
+        inc ecx         ; número real de líneas = saltos + 1
+        mov total, ecx
+    }
+
+    return total;
+}
 

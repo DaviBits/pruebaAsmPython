@@ -7,6 +7,10 @@ int cmpCad(char* a, char* b);
 int charInCad(char c, char* cad);
 void mezclarCadena(char* cad);
 void init_rand_seed();
+
+int leerArchivo(const char *nombre, char *buffer, int max);
+void obtenerLineaRandom(char *buffer, char *out);
+int contarLineas(char *buffer);
 '''
 
 ffibuilder = FFI()
@@ -19,4 +23,5 @@ ffibuilder.set_source(
     include_dirs=['.']
 )
 
-ffibuilder.compile(verbose=True)
+if __name__ == "__main__":
+    ffibuilder.compile(verbose=True)
