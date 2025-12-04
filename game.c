@@ -331,3 +331,290 @@ int contarLineas(char *buffer) {
     return total;
 }
 
+int letraEnPosicion(char letra, const char* palabra, int posicion) {
+    int resultado = 0;
+    
+    __asm {
+        mov al, [ebp+8]      ; char letra
+        mov esi, [ebp+12]    ; const char* palabra
+        mov ecx, [ebp+16]    ; int posicion
+        mov resultado, 0     ; resultado inicial = 0
+        
+        ; Verificar si la posición es válida (no negativa)
+        cmp ecx, 0
+        jl fin_letraPos
+        
+        ; Buscar la posición en la cadena
+        xor ebx, ebx         ; contador de posición actual
+        
+    buscar_posicion:
+        mov dl, [esi+ebx]
+        cmp dl, 0
+        je fin_letraPos      ; Fin de cadena alcanzado
+        
+        cmp ebx, ecx
+        je verificar_letra   ; Llegamos a la posición deseada
+        
+        inc ebx
+        jmp buscar_posicion
+
+    verificar_letra:
+        ; Comparar la letra en esa posición
+        cmp al, dl
+        jne fin_letraPos
+        
+        ; Coincidencia encontrada
+        mov resultado, 1
+        jmp fin_letraPos
+
+    fin_letraPos:
+        ; El resultado ya está en la variable
+    }
+    
+    return resultado;
+}
+
+int contarOcurrencias(char letra, const char* palabra) {
+    int cuantas = 0;
+    
+    __asm {
+        mov al, [ebp+8]      ; char letra
+        mov esi, [ebp+12]    ; const char* palabra
+        xor ecx, ecx         ; contador = 0
+
+    ciclo_contar:
+        mov dl, [esi]
+        cmp dl, 0
+        je fin_contar
+        
+        cmp al, dl
+        jne siguiente_char
+        
+        ; Encontrada coincidencia
+        inc ecx
+
+    siguiente_char:
+        inc esi
+        jmp ciclo_contar
+
+    fin_contar:
+        mov cuantas, ecx
+    }
+    
+    return cuantas;
+}
+
+void obtenerPista(const char* palabra, const char* palabraOculta, char* resultado) {
+    __asm {
+        push ebx
+        push edi
+        push esi
+        
+        mov esi, [ebp+8]     ; const char* palabra
+        mov edi, [ebp+12]    ; const char* palabraOculta
+        mov ebx, [ebp+16]    ; char* resultado
+        
+        ; Primero, copiar palabraOculta a resultado
+        xor ecx, ecx         ; índice
+        
+    copiar_ciclo:
+        mov al, [edi+ecx]
+        mov [ebx+ecx], al
+        inc ecx
+        test al, al
+        jnz copiar_ciclo
+        
+        ; Ahora buscar posiciones ocultas (guiones bajos '_')
+        dec ecx              ; longitud - 1 (sin contar el null)
+        jle fin_pista        ; Si longitud <= 1, no hacer nada
+        
+        ; Generar posición aleatoria entre 0 y ecx-1
+        push ecx
+        call rand
+        pop ecx
+        
+        ; eax contiene número aleatorio, hacer módulo ecx
+        xor edx, edx
+        div ecx              ; edx = eax % ecx (posición aleatoria)
+        
+        ; Buscar desde la posición aleatoria una letra oculta
+        mov eax, edx         ; posición inicial aleatoria
+        xor edx, edx         ; contador de intentos
+        
+    buscar_oculta:
+        ; Verificar si en esta posición hay '_'
+        cmp byte ptr [edi+eax], '_'
+        jne siguiente_posicion
+        
+        ; Encontrada posición oculta, revelar letra
+        mov cl, [esi+eax]    ; letra original
+        mov [ebx+eax], cl    ; poner en resultado
+        jmp fin_pista
+
+    siguiente_posicion:
+        inc eax
+        inc edx
+        cmp edx, ecx
+        jl buscar_siguiente
+        
+        ; Si llegamos aquí, buscar desde el principio
+        xor eax, eax
+        xor edx, edx
+        
+    buscar_siguiente:
+        ; Verificar si hemos revisado todas las posiciones
+        cmp edx, ecx
+        jl buscar_oculta
+
+    fin_pista:
+        pop esi
+        pop edi
+        pop ebx
+    }
+}
+
+int cmpCadIgnoreCase(const char* cad1, const char* cad2) {
+    int iguales = 1;
+    
+    __asm {
+        push ebx
+        push edi
+        push esi
+        
+        mov esi, [ebp+8]     ; const char* cad1
+        mov edi, [ebp+12]    ; const char* cad2
+        
+        mov iguales, 1       ; asumir iguales
+
+    comparar_ciclo:
+        mov al, [esi]
+        mov bl, [edi]
+        
+        ; Si ambos son null, fin de cadenas iguales
+        test al, al
+        jz verificar_fin_cad2
+        test bl, bl
+        jz no_iguales
+        
+        ; Convertir a mayúsculas si es minúscula
+        cmp al, 'a'
+        jb check_cad1_upper
+        cmp al, 'z'
+        ja check_cad1_upper
+        sub al, 32           ; Convertir a mayúscula
+
+    check_cad1_upper:
+        ; Hacer lo mismo para bl
+        cmp bl, 'a'
+        jb comparar_chars
+        cmp bl, 'z'
+        ja comparar_chars
+        sub bl, 32           ; Convertir a mayúscula
+
+    comparar_chars:
+        cmp al, bl
+        jne no_iguales
+        
+        inc esi
+        inc edi
+        jmp comparar_ciclo
+
+    verificar_fin_cad2:
+        ; Verificar si cad2 también terminó
+        cmp byte ptr [edi], 0
+        jne no_iguales
+        
+        ; Cadenas iguales
+        jmp salir_cmp
+
+    no_iguales:
+        mov iguales, 0
+
+    salir_cmp:
+        pop esi
+        pop edi
+        pop ebx
+    }
+    
+    return iguales;
+}
+
+void letrasUnicas(const char* palabra, char* resultado) {
+    __asm {
+        push ebp
+        mov ebp, esp
+        push ebx
+        push edi
+        push esi
+        
+        mov esi, [ebp+8]     ; const char* palabra
+        mov edi, [ebp+12]    ; char* resultado
+        
+        ; Tabla de presencia de letras (26 letras) en la pila
+        sub esp, 26          ; Reservar espacio en pila
+        mov ebx, esp         ; ebx apunta a la tabla
+        
+        ; Inicializar tabla con ceros
+        xor eax, eax
+        mov ecx, 26
+        mov edx, ebx
+    inicializar_tabla:
+        mov byte ptr [edx], al
+        inc edx
+        loop inicializar_tabla
+    procesar_palabra:
+        mov al, [esi]
+        test al, al
+        jz construir_resultado
+        
+        cmp al, 'a'
+        jb check_letra
+        cmp al, 'z'
+        ja check_letra
+        sub al, 32
+
+    check_letra:
+        cmp al, 'A'
+        jb siguiente_letra
+        cmp al, 'Z'
+        ja siguiente_letra
+        sub al, 'A'
+        movzx cx, al 
+        mov byte ptr [ebx+ecx], 1
+
+    siguiente_letra:
+        inc esi
+        jmp procesar_palabra
+
+    construir_resultado:
+        xor ecx, ecx
+        xor edx, edx
+        
+    construir_ciclo:
+        cmp edx, 26
+        jge fin_unicas
+        
+        cmp byte ptr [ebx+edx], 0
+        je siguiente_indice
+        
+        ; Agregar letra al resultado
+        mov al, dl
+        add al, 'A'
+        mov [edi+ecx], al
+        inc ecx
+
+    siguiente_indice:
+        inc edx
+        jmp construir_ciclo
+
+    fin_unicas:
+        mov byte ptr [edi+ecx], 0
+        
+        add esp, 26
+        
+        pop esi
+        pop edi
+        pop ebx
+        pop ebp
+    }
+}

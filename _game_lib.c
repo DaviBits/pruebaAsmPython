@@ -576,34 +576,56 @@ static void (*_cffi_call_python_org)(struct _cffi_externpy_s *, char *);
 
 static void *_cffi_types[] = {
 /*  0 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char *)
-/*  1 */ _CFFI_OP(_CFFI_OP_POINTER, 13), // char *
+/*  1 */ _CFFI_OP(_CFFI_OP_POINTER, 17), // char *
 /*  2 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
 /*  3 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char *, char *)
 /*  4 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /*  5 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /*  6 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
 /*  7 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char const *, char *, int)
-/*  8 */ _CFFI_OP(_CFFI_OP_POINTER, 13), // char const *
+/*  8 */ _CFFI_OP(_CFFI_OP_POINTER, 17), // char const *
 /*  9 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 10 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7), // int
 /* 11 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 12 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char, char *)
-/* 13 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2), // char
-/* 14 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 12 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char const *, char const *)
+/* 13 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 14 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
 /* 15 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 16 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(int)
-/* 17 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 18 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 19 */ _CFFI_OP(_CFFI_OP_FUNCTION, 28), // void()(char *)
-/* 20 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 21 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 22 */ _CFFI_OP(_CFFI_OP_FUNCTION, 28), // void()(char *, char *)
-/* 23 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 24 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 25 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 26 */ _CFFI_OP(_CFFI_OP_FUNCTION, 28), // void()(void)
-/* 27 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 28 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
+/* 16 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char, char *)
+/* 17 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2), // char
+/* 18 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 19 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 20 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char, char const *)
+/* 21 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2),
+/* 22 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 23 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 24 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(char, char const *, int)
+/* 25 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2),
+/* 26 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 27 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 28 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 29 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(int)
+/* 30 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
+/* 31 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 32 */ _CFFI_OP(_CFFI_OP_FUNCTION, 50), // void()(char *)
+/* 33 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 34 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 35 */ _CFFI_OP(_CFFI_OP_FUNCTION, 50), // void()(char *, char *)
+/* 36 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 37 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 38 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 39 */ _CFFI_OP(_CFFI_OP_FUNCTION, 50), // void()(char const *, char *)
+/* 40 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 41 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 42 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 43 */ _CFFI_OP(_CFFI_OP_FUNCTION, 50), // void()(char const *, char const *, char *)
+/* 44 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 45 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 46 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 47 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 48 */ _CFFI_OP(_CFFI_OP_FUNCTION, 50), // void()(void)
+/* 49 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 50 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
 };
 
 static int _cffi_d_charInCad(char x0, char * x1)
@@ -707,6 +729,59 @@ _cffi_f_cmpCad(PyObject *self, PyObject *args)
 #  define _cffi_f_cmpCad _cffi_d_cmpCad
 #endif
 
+static int _cffi_d_cmpCadIgnoreCase(char const * x0, char const * x1)
+{
+  return cmpCadIgnoreCase(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_cmpCadIgnoreCase(PyObject *self, PyObject *args)
+{
+  char const * x0;
+  char const * x1;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  int result;
+  PyObject *pyresult;
+  PyObject *arg0;
+  PyObject *arg1;
+
+  if (!PyArg_UnpackTuple(args, "cmpCadIgnoreCase", 2, 2, &arg0, &arg1))
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(8), arg0, (char **)&x0);
+  if (datasize != 0) {
+    x0 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(8), arg0, (char **)&x0,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(8), arg1, (char **)&x1);
+  if (datasize != 0) {
+    x1 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(8), arg1, (char **)&x1,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = cmpCadIgnoreCase(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  pyresult = _cffi_from_c_int(result, int);
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  return pyresult;
+}
+#else
+#  define _cffi_f_cmpCadIgnoreCase _cffi_d_cmpCadIgnoreCase
+#endif
+
 static int _cffi_d_contarLineas(char * x0)
 {
   return contarLineas(x0);
@@ -743,6 +818,54 @@ _cffi_f_contarLineas(PyObject *self, PyObject *arg0)
 }
 #else
 #  define _cffi_f_contarLineas _cffi_d_contarLineas
+#endif
+
+static int _cffi_d_contarOcurrencias(char x0, char const * x1)
+{
+  return contarOcurrencias(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_contarOcurrencias(PyObject *self, PyObject *args)
+{
+  char x0;
+  char const * x1;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  int result;
+  PyObject *pyresult;
+  PyObject *arg0;
+  PyObject *arg1;
+
+  if (!PyArg_UnpackTuple(args, "contarOcurrencias", 2, 2, &arg0, &arg1))
+    return NULL;
+
+  x0 = (char)_cffi_to_c_char(arg0);
+  if (x0 == (char)-1 && PyErr_Occurred())
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(8), arg1, (char **)&x1);
+  if (datasize != 0) {
+    x1 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(8), arg1, (char **)&x1,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = contarOcurrencias(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  pyresult = _cffi_from_c_int(result, int);
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  return pyresult;
+}
+#else
+#  define _cffi_f_contarOcurrencias _cffi_d_contarOcurrencias
 #endif
 
 static void _cffi_d_init_rand_seed(void)
@@ -866,6 +989,111 @@ _cffi_f_lenCad(PyObject *self, PyObject *arg0)
 #  define _cffi_f_lenCad _cffi_d_lenCad
 #endif
 
+static int _cffi_d_letraEnPosicion(char x0, char const * x1, int x2)
+{
+  return letraEnPosicion(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_letraEnPosicion(PyObject *self, PyObject *args)
+{
+  char x0;
+  char const * x1;
+  int x2;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  int result;
+  PyObject *pyresult;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+
+  if (!PyArg_UnpackTuple(args, "letraEnPosicion", 3, 3, &arg0, &arg1, &arg2))
+    return NULL;
+
+  x0 = (char)_cffi_to_c_char(arg0);
+  if (x0 == (char)-1 && PyErr_Occurred())
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(8), arg1, (char **)&x1);
+  if (datasize != 0) {
+    x1 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(8), arg1, (char **)&x1,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  x2 = _cffi_to_c_int(arg2, int);
+  if (x2 == (int)-1 && PyErr_Occurred())
+    return NULL;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = letraEnPosicion(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  pyresult = _cffi_from_c_int(result, int);
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  return pyresult;
+}
+#else
+#  define _cffi_f_letraEnPosicion _cffi_d_letraEnPosicion
+#endif
+
+static void _cffi_d_letrasUnicas(char const * x0, char * x1)
+{
+  letrasUnicas(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_letrasUnicas(PyObject *self, PyObject *args)
+{
+  char const * x0;
+  char * x1;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  PyObject *arg0;
+  PyObject *arg1;
+
+  if (!PyArg_UnpackTuple(args, "letrasUnicas", 2, 2, &arg0, &arg1))
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(8), arg0, (char **)&x0);
+  if (datasize != 0) {
+    x0 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(8), arg0, (char **)&x0,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg1, (char **)&x1);
+  if (datasize != 0) {
+    x1 = ((size_t)datasize) <= 640 ? (char *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(1), arg1, (char **)&x1,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { letrasUnicas(x0, x1); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_letrasUnicas _cffi_d_letrasUnicas
+#endif
+
 static void _cffi_d_mezclarCadena(char * x0)
 {
   mezclarCadena(x0);
@@ -953,6 +1181,68 @@ _cffi_f_obtenerLineaRandom(PyObject *self, PyObject *args)
 #  define _cffi_f_obtenerLineaRandom _cffi_d_obtenerLineaRandom
 #endif
 
+static void _cffi_d_obtenerPista(char const * x0, char const * x1, char * x2)
+{
+  obtenerPista(x0, x1, x2);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_obtenerPista(PyObject *self, PyObject *args)
+{
+  char const * x0;
+  char const * x1;
+  char * x2;
+  Py_ssize_t datasize;
+  struct _cffi_freeme_s *large_args_free = NULL;
+  PyObject *arg0;
+  PyObject *arg1;
+  PyObject *arg2;
+
+  if (!PyArg_UnpackTuple(args, "obtenerPista", 3, 3, &arg0, &arg1, &arg2))
+    return NULL;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(8), arg0, (char **)&x0);
+  if (datasize != 0) {
+    x0 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(8), arg0, (char **)&x0,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(8), arg1, (char **)&x1);
+  if (datasize != 0) {
+    x1 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(8), arg1, (char **)&x1,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(1), arg2, (char **)&x2);
+  if (datasize != 0) {
+    x2 = ((size_t)datasize) <= 640 ? (char *)alloca((size_t)datasize) : NULL;
+    if (_cffi_convert_array_argument(_cffi_type(1), arg2, (char **)&x2,
+            datasize, &large_args_free) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { obtenerPista(x0, x1, x2); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  if (large_args_free != NULL) _cffi_free_array_arguments(large_args_free);
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_obtenerPista _cffi_d_obtenerPista
+#endif
+
 static int _cffi_d_rnd(int x0)
 {
   return rnd(x0);
@@ -984,15 +1274,20 @@ _cffi_f_rnd(PyObject *self, PyObject *arg0)
 #endif
 
 static const struct _cffi_global_s _cffi_globals[] = {
-  { "charInCad", (void *)_cffi_f_charInCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 12), (void *)_cffi_d_charInCad },
+  { "charInCad", (void *)_cffi_f_charInCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 16), (void *)_cffi_d_charInCad },
   { "cmpCad", (void *)_cffi_f_cmpCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 3), (void *)_cffi_d_cmpCad },
+  { "cmpCadIgnoreCase", (void *)_cffi_f_cmpCadIgnoreCase, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 12), (void *)_cffi_d_cmpCadIgnoreCase },
   { "contarLineas", (void *)_cffi_f_contarLineas, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 0), (void *)_cffi_d_contarLineas },
-  { "init_rand_seed", (void *)_cffi_f_init_rand_seed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 26), (void *)_cffi_d_init_rand_seed },
+  { "contarOcurrencias", (void *)_cffi_f_contarOcurrencias, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 20), (void *)_cffi_d_contarOcurrencias },
+  { "init_rand_seed", (void *)_cffi_f_init_rand_seed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 48), (void *)_cffi_d_init_rand_seed },
   { "leerArchivo", (void *)_cffi_f_leerArchivo, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 7), (void *)_cffi_d_leerArchivo },
   { "lenCad", (void *)_cffi_f_lenCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 0), (void *)_cffi_d_lenCad },
-  { "mezclarCadena", (void *)_cffi_f_mezclarCadena, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 19), (void *)_cffi_d_mezclarCadena },
-  { "obtenerLineaRandom", (void *)_cffi_f_obtenerLineaRandom, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 22), (void *)_cffi_d_obtenerLineaRandom },
-  { "rnd", (void *)_cffi_f_rnd, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 16), (void *)_cffi_d_rnd },
+  { "letraEnPosicion", (void *)_cffi_f_letraEnPosicion, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 24), (void *)_cffi_d_letraEnPosicion },
+  { "letrasUnicas", (void *)_cffi_f_letrasUnicas, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 39), (void *)_cffi_d_letrasUnicas },
+  { "mezclarCadena", (void *)_cffi_f_mezclarCadena, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 32), (void *)_cffi_d_mezclarCadena },
+  { "obtenerLineaRandom", (void *)_cffi_f_obtenerLineaRandom, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 35), (void *)_cffi_d_obtenerLineaRandom },
+  { "obtenerPista", (void *)_cffi_f_obtenerPista, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 43), (void *)_cffi_d_obtenerPista },
+  { "rnd", (void *)_cffi_f_rnd, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 29), (void *)_cffi_d_rnd },
 };
 
 static const struct _cffi_type_context_s _cffi_type_context = {
@@ -1002,12 +1297,12 @@ static const struct _cffi_type_context_s _cffi_type_context = {
   NULL,  /* no struct_unions */
   NULL,  /* no enums */
   NULL,  /* no typenames */
-  9,  /* num_globals */
+  14,  /* num_globals */
   0,  /* num_struct_unions */
   0,  /* num_enums */
   0,  /* num_typenames */
   NULL,  /* no includes */
-  29,  /* num_types */
+  51,  /* num_types */
   0,  /* flags */
 };
 
