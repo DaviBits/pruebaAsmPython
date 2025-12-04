@@ -37,8 +37,8 @@ class InterfazDemo:
 
         rutas = [
             os.path.join(carpeta_mem, "img1.png"),
-            os.path.join(carpeta_mem, "img2.jpg"),
-            os.path.join(carpeta_mem, "img3.jpg"),
+            os.path.join(carpeta_mem, "img2.png"),
+            os.path.join(carpeta_mem, "img3.png"),
             os.path.join(carpeta_mem, "img4.png")
         ]
 
