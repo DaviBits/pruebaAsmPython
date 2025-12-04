@@ -239,7 +239,6 @@ class InterfazDemo:
             # Solo colocar en slots no bloqueados y vacíos
             if slot.cget("text") == "" and not self.letras_bloqueadas[i]:
                 slot.config(text=letra, fg="yellow", bg="#333333")
-<<<<<<< HEAD
                 
                 # Obtener el índice en la palabra sin espacios
                 # Primero, necesitamos saber cuántas letras hemos colocado antes
@@ -265,8 +264,6 @@ class InterfazDemo:
                     if posicion_correcta == 1:
                         slot.config(bg="#8bc34a", fg="white")
                 
-=======
->>>>>>> 59e569e6f44256d66ef85c210eddaacf73769bb7
                 break
 
     # ===================================
