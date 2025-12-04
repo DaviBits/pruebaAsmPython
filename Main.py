@@ -525,7 +525,20 @@ class MenuSimple:
             command=lambda: self.iniciar(2)
         )
         btn_dificil.pack(pady=5)
-        
+
+        btn_resultados = tk.Button(
+            frame,
+            text=" VER RESULTADOS",
+            font=("Helvetica", 12, "bold"),
+            bg="#2196F3",
+            fg="white",
+            width=25,
+            height=2,
+            bd=3,
+            relief=tk.RIDGE,
+            command=self.mostrar_resultados
+        )
+        btn_resultados.pack(pady=(25, 10))
         tk.Label(
             root,
             text="Usa el TECLADO para escribir letras",
@@ -533,6 +546,55 @@ class MenuSimple:
             bg="#1e1e1e",
             fg="#888888"
         ).pack(pady=30)
+
+    def mostrar_resultados(self):
+        resultados_window = tk.Toplevel(self.root)
+        resultados_window.title("Resultados Históricos del Juego")
+        resultados_window.configure(bg="#1e1e1e")
+        resultados_window.geometry("700x500")
+        
+        try:
+            with open(RESULTADOS_FILE, "r", encoding="utf-8") as f:
+                contenido = f.read()
+        except FileNotFoundError:
+            contenido = "Aún no hay resultados guardados. ¡Juega una partida para empezar!"
+        except Exception as e:
+            contenido = f"Error al leer el archivo de resultados: {e}"
+
+        frame_texto = tk.Frame(resultados_window, bg="#1e1e1e")
+        frame_texto.pack(padx=20, pady=20, fill="both", expand=True)
+
+        scrollbar = tk.Scrollbar(frame_texto, orient=tk.VERTICAL)
+        
+        text_widget = tk.Text(
+            frame_texto,
+            font=("Courier", 10),
+            bg="#2b2b2b",
+            fg="white",
+            height=20,
+            width=80,
+            wrap="word",
+            padx=10,
+            pady=10,
+            yscrollcommand=scrollbar.set
+        )
+        text_widget.pack(side="left", fill="both", expand=True)
+        
+        scrollbar.config(command=text_widget.yview)
+        scrollbar.pack(side="right", fill="y")
+        
+        text_widget.insert(tk.END, "--- Resultados de Partidas ---\n\n")
+        text_widget.insert(tk.END, contenido)
+        text_widget.config(state=tk.DISABLED)
+
+        tk.Button(
+            resultados_window,
+            text="Cerrar",
+            command=resultados_window.destroy,
+            bg="#607D8B",
+            fg="white",
+            font=("Helvetica", 12, "bold")
+        ).pack(pady=(0, 10))
 
     def iniciar(self, dificultad):
         self.root.destroy()
@@ -543,9 +605,6 @@ class MenuSimple:
 
 if __name__ == "__main__":
     
-    try:
-        root = tk.Tk()
-        menu = MenuSimple(root)
-        root.mainloop()
-    except Exception as e:
-        print(f"Error al ejecutar la aplicación gráfica: {e}")
+    root = tk.Tk()
+    menu = MenuSimple(root)
+    root.mainloop()

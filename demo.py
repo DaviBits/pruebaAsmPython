@@ -7,7 +7,7 @@ import tkinter as tk
 
 lib = _game_lib.lib
 ffi = FFI()
-lib.init_rand_seed()
+lib.init_rand_seed() # ← USO DE ASM: Inicializa semilla para números aleatorios
 
 BASE = os.path.abspath(os.path.dirname(__file__))
 
@@ -23,11 +23,11 @@ def obtener_categoria(dificultad: int) -> str:
     txt_buffer = ffi.new("char[]", 4096)
     categoria = ffi.new("char[]", 256)
 
-    leidos = lib.leerArchivo(ARCHIVOS[dificultad], txt_buffer, 4096)
+    leidos = lib.leerArchivo(ARCHIVOS[dificultad], txt_buffer, 4096) # ← USO DE ASM: Lee archivo
     if leidos <= 0:
         raise FileNotFoundError(f"No se pudo leer archivo de dificultad {dificultad}")
 
-    lib.obtenerLineaRandom(txt_buffer, categoria)
+    lib.obtenerLineaRandom(txt_buffer, categoria) # ← USO DE ASM: Obtiene línea aleatoria
     return ffi.string(categoria).decode().strip()
 
 
@@ -72,13 +72,13 @@ class InterfazDemo:
         
         tk.Label(
             frame_header,
-            text="🎯 ADIVINA LA PALABRA",
+            text="ADIVINA LA PALABRA",
             font=("Helvetica", 22, "bold"),
             bg=self.color_bg,
             fg=self.color_text
         ).pack(side="left")
         
-        self.tiempo_var = tk.StringVar(value="⏱️ 00:00.000")
+        self.tiempo_var = tk.StringVar(value="00:00.000")
         self.label_tiempo = tk.Label(
             frame_header,
             textvariable=self.tiempo_var,
@@ -113,10 +113,8 @@ class InterfazDemo:
         frame_imgs.pack(pady=15)
 
         if dificultad == 0:
-            num_imagenes = 6
-        elif dificultad == 1:
             num_imagenes = 4
-        elif dificultad == 2:
+        else:
             num_imagenes = 2
         
         for i in range(1, num_imagenes + 1):
@@ -142,7 +140,7 @@ class InterfazDemo:
         
         tk.Label(
             frame_slots_container,
-            text="Escribe con el teclado o haz clic en letras para borrar",
+            text="Escribe con el teclado",
             font=("Helvetica", 12),
             bg=self.color_bg,
             fg="#2196F3"
@@ -176,7 +174,7 @@ class InterfazDemo:
         
         self.btn_validar = tk.Button(
             frame_controles,
-            text="✅ VALIDAR (ENTER)",
+            text="VALIDAR (ENTER)",
             font=("Helvetica", 14, "bold"),
             bg="#4caf50",
             fg="white",
@@ -188,7 +186,7 @@ class InterfazDemo:
         
         btn_salir = tk.Button(
             frame_controles,
-            text="🏠 SALIR AL MENÚ",
+            text="SALIR AL MENÚ",
             font=("Helvetica", 12),
             bg="#2196F3",
             fg="white",
@@ -217,7 +215,7 @@ class InterfazDemo:
         letras_disponibles_set = set(letras_unicas)
         
         while len(letras_disponibles_set) < target_length:
-            rand_num = lib.rnd(26) 
+            rand_num = lib.rnd(26) # ← USO DE ASM: Genera número aleatorio entre 0-25
             letra = chr(65 + rand_num)
             letras_disponibles_set.add(letra)
         
@@ -228,7 +226,8 @@ class InterfazDemo:
         buffer = ffi.new("char[]", buffer_len)
         buffer_bytes = letras_str.encode('ascii')
         ffi.buffer(buffer)[:len(buffer_bytes)] = buffer_bytes
-        lib.mezclarCadena(buffer)
+        
+        lib.mezclarCadena(buffer)# ← USO DE ASM: Mezcla aleatoriamente la cadena
         
         return ffi.string(buffer).decode().strip()
 
