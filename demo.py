@@ -287,6 +287,31 @@ class InterfazDemo:
             texto_b = texto.encode() if texto else b""
             if lib.lenCad(texto_b) == 0 and not self.letras_bloqueadas[i]:
                 slot.config(text=letra, fg="yellow", bg="#333333")
+                
+                # Obtener el índice en la palabra sin espacios
+                # Primero, necesitamos saber cuántas letras hemos colocado antes
+                indice_en_palabra = 0
+                for j in range(i):
+                    if self.slots[j].cget("text") != "":
+                        indice_en_palabra += 1
+                
+                # USAR charInCad PARA VERIFICAR SI LA LETRA ESTÁ EN LA PALABRA
+                letra_b = letra.encode()
+                palabra_b = self.word.replace(" ", "").encode()
+                esta = lib.charInCad(letra_b, palabra_b)
+                
+                if esta == 1:
+                    # USAR letraEnPosicion PARA VERIFICAR SI ESTÁ EN POSICIÓN CORRECTA
+                    # Usar el índice en la palabra sin espacios
+                    posicion_correcta = lib.letraEnPosicion(
+                        letra_b, 
+                        palabra_b, 
+                        indice_en_palabra  # Índice en la palabra sin espacios
+                    )
+                    
+                    if posicion_correcta == 1:
+                        slot.config(bg="#8bc34a", fg="white")
+                
                 break
 
     def remover_letra(self, index):
@@ -445,12 +470,9 @@ class InterfazDemo:
                 slot.config(text="", fg="white", bg=self.color_bg)
 
 
-# ============================
-# MAIN
-# ============================
 if __name__ == "__main__":
     root = tk.Tk()
     app = InterfazDemo(root, dificultad=2)
     root.mainloop()
-
-    #ultima version de artemio
+    app = InterfazDemo(root, dificultad=2)
+    root.mainloop()
