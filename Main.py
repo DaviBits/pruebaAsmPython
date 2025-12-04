@@ -460,12 +460,12 @@ class MenuSimple:
     def __init__(self, root):
         self.root = root
         root.title("4 Imágenes 1 Palabra")
-        root.geometry("500x400")
+        root.geometry("900x1000")
         root.configure(bg="#1e1e1e")
         
         tk.Label(
             root,
-            text="🎮 4 IMÁGENES 1 PALABRA",
+            text=" 4 IMÁGENES 1 PALABRA",
             font=("Helvetica", 28, "bold"),
             bg="#1e1e1e",
             fg="#4CAF50"
@@ -473,7 +473,7 @@ class MenuSimple:
         
         tk.Label(
             root,
-            text="Con funciones en Assembler",
+            text="Por David Garcia y Artemio VillaLobos",
             font=("Helvetica", 14),
             bg="#1e1e1e",
             fg="#FFD700"

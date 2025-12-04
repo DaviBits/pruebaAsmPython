@@ -413,12 +413,12 @@ class InterfazDemo:
         mensaje = f"Intentos: {self.intentos}\n"
         
         if posiciones_correctas > 0:
-            mensaje += f"✅ {posiciones_correctas} letra(s) correcta(s) en posición. ¡Bloqueadas!\n"
+            mensaje += f" {posiciones_correctas} letra(s) correcta(s) en posición. ¡Bloqueadas!\n"
         
         if correctas_mal_pos > 0:
             mensaje += f"🟡 Hay {correctas_mal_pos} letra(s) que pertenecen a la palabra pero están en mala posición.\n"
         elif posiciones_correctas == 0:
-            mensaje += "❌ Ninguna letra correcta en posición."
+            mensaje += " Ninguna letra correcta en posición."
         
         messagebox.showwarning("Incorrecto", mensaje)
         
@@ -436,7 +436,7 @@ class MenuSimple:
         
         tk.Label(
             main_frame,
-            text="🖼️ 4 IMÁGENES 1 PALABRA 🧠",
+            text="4 IMÁGENES 1 PALABRA ",
             font=("Helvetica", 30, "bold"),
             bg="#1e1e1e",
             fg="#FFC300"
@@ -444,7 +444,7 @@ class MenuSimple:
         
         tk.Label(
             main_frame,
-            text="¡Prueba tus conocimientos con funciones de bajo nivel!",
+            
             font=("Helvetica", 14, "italic"),
             bg="#1e1e1e",
             fg="#AAAAAA"
@@ -471,7 +471,7 @@ class MenuSimple:
         
         btn_facil = tk.Button(
             main_frame,
-            text="🌟 FÁCIL (4 Imágenes)",
+            text=" FÁCIL (4 Imágenes)",
             bg="#4CAF50",
             command=lambda: self.iniciar(0),
             **button_style
@@ -480,7 +480,7 @@ class MenuSimple:
         
         btn_medio = tk.Button(
             main_frame,
-            text="🔶 MEDIO (2 Imágenes)",
+            text=" MEDIO (2 Imágenes)",
             bg="#FF9800",
             command=lambda: self.iniciar(1),
             **button_style
@@ -489,7 +489,7 @@ class MenuSimple:
         
         btn_dificil = tk.Button(
             main_frame,
-            text="🔥 DIFÍCIL (2 Imágenes)",
+            text=" DIFÍCIL (2 Imágenes)",
             bg="#F44336",
             command=lambda: self.iniciar(2),
             **button_style
@@ -498,7 +498,7 @@ class MenuSimple:
         
         btn_resultados = tk.Button(
             main_frame,
-            text="🏆 VER RESULTADOS",
+            text=" VER RESULTADOS",
             font=("Helvetica", 12, "bold"),
             bg="#2196F3",
             fg="white",
