@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdlib.h>   
 #include <Windows.h>
+
 static unsigned int global_seed = 0;
 static DWORD tiempo_inicio = 0;
 static DWORD tiempo_total = 0;
@@ -26,39 +27,31 @@ DWORD obtener_tiempo_actual();
 void formato_tiempo_mm_ss(DWORD ms, char* buffer);
 
 
-void init_rand_seed() {
+void init_rand_seed() {  // Inicializa la semilla para números aleatorios
     global_seed = (unsigned int)time(NULL) ^ (unsigned int)getpid();
 }
 
-void iniciar_temporizador() {
+void iniciar_temporizador() {  // Inicia el temporizador
     __asm {
-        call GetTickCount      ; Llama a la función de Windows
-        mov tiempo_inicio, eax ; Guarda el tiempo de inicio
+        call GetTickCount
+        mov tiempo_inicio, eax
     }
 }
 
-// ============================================
-// 2. DETENER TEMPORIZADOR Y OBTENER TIEMPO
-// ============================================
-DWORD detener_temporizador() {
+DWORD detener_temporizador() {  // Detiene el temporizador y devuelve tiempo transcurrido
     DWORD tiempo_transcurrido;
     
     __asm {
-        call GetTickCount          ; Obtiene tiempo actual
-        sub eax, tiempo_inicio     ; Resta tiempo de inicio
-        mov tiempo_transcurrido, eax ; Guarda resultado
-        
-        ; Opcional: sumar al tiempo total
+        call GetTickCount
+        sub eax, tiempo_inicio
+        mov tiempo_transcurrido, eax
         add tiempo_total, eax
     }
     
-    return tiempo_transcurrido;  // Milisegundos
+    return tiempo_transcurrido;
 }
 
-// ============================================
-// 3. OBTENER TIEMPO ACTUAL SIN DETENER
-// ============================================
-DWORD obtener_tiempo_actual() {
+DWORD obtener_tiempo_actual() {  // Obtiene tiempo actual sin detener
     DWORD tiempo_actual;
     
     __asm {
@@ -70,50 +63,41 @@ DWORD obtener_tiempo_actual() {
     return tiempo_actual;
 }
 
-// ============================================
-// 4. FUNCIÓN PARA FORMATO "MM:SS"
-// ============================================
-void formato_tiempo_mm_ss(DWORD ms, char* buffer) {
+void formato_tiempo_mm_ss(DWORD ms, char* buffer) {  // Formatea tiempo a "MM:SS"
     __asm {
         push ebx
         push esi
         push edi
         
-        mov eax, ms           ; Milisegundos a convertir
-        mov edi, buffer       ; Buffer de salida
+        mov eax, ms
+        mov edi, buffer
         
-        ; ---- CALCULAR MINUTOS ----
-        ; minutos = ms / 60000
         xor edx, edx
-        mov ecx, 60000        ; 60 segundos * 1000 ms
-        div ecx               ; EAX = minutos, EDX = ms restantes
+        mov ecx, 60000
+        div ecx
         
-        ; Formatear minutos (2 dígitos)
-        mov bl, 10
-        div bl                ; AL = decenas, AH = unidades
-        
-        add al, '0'
-        mov [edi], al         ; Primer dígito
-        add ah, '0'
-        mov [edi+1], ah       ; Segundo dígito
-        mov byte ptr [edi+2], ':' ; Separador
-        
-        ; ---- CALCULAR SEGUNDOS ----
-        ; segundos = ms_restantes / 1000
-        mov eax, edx          ; ms restantes
-        xor edx, edx
-        mov ecx, 1000
-        div ecx               ; EAX = segundos
-        
-        ; Formatear segundos (2 dígitos)
         mov bl, 10
         div bl
         
         add al, '0'
-        mov [edi+3], al       ; Primer dígito segundos
+        mov [edi], al
         add ah, '0'
-        mov [edi+4], ah       ; Segundo dígito segundos
-        mov byte ptr [edi+5], 0 ; Null terminator
+        mov [edi+1], ah
+        mov byte ptr [edi+2], ':'
+        
+        mov eax, edx
+        xor edx, edx
+        mov ecx, 1000
+        div ecx
+        
+        mov bl, 10
+        div bl
+        
+        add al, '0'
+        mov [edi+3], al
+        add ah, '0'
+        mov [edi+4], ah
+        mov byte ptr [edi+5], 0
         
         pop edi
         pop esi
@@ -121,24 +105,20 @@ void formato_tiempo_mm_ss(DWORD ms, char* buffer) {
     }
 }
 
-int rnd(int max){
+int rnd(int max){  // Genera número aleatorio entre 0 y max-1
      int resultado;
     
     __asm {
-        // Llamar a GetTickCount
-        call GetTickCount  ; EAX = milisegundos desde boot
-        
-        // Usar como semilla para generador aleatorio
+        call GetTickCount
         mov ecx, 1664525
-        imul ecx          ; EDX:EAX = EAX * ECX
+        imul ecx
         add eax, 1013904223
         
-        // Aplicar módulo
         xor edx, edx
         mov ecx, max
         test ecx, ecx
         jz fin
-        div ecx           ; EDX = EAX % ECX
+        div ecx
         mov resultado, edx
         jmp fin
         
@@ -148,7 +128,7 @@ int rnd(int max){
     return resultado;
 }
 
-int cmpCad(char cad1[], char cad2[]) { 
+int cmpCad(char cad1[], char cad2[]) {  // Compara dos cadenas
     int esLaMisma = 1;
 
     __asm {
@@ -193,9 +173,8 @@ int cmpCad(char cad1[], char cad2[]) {
     return esLaMisma;
 }
 
-
-int charInCad(char car, char cad[]) { // caracter, cadena
-    int contCar = 1;   // 1 sí lo contiene, 0  no
+int charInCad(char car, char cad[]) {  // Verifica si un carácter está en una cadena
+    int contCar = 1;
 
     __asm {
         mov al, car 
@@ -221,7 +200,7 @@ int charInCad(char car, char cad[]) { // caracter, cadena
     return contCar;
 }
 
-int lenCad(char cad[]) {
+int lenCad(char cad[]) {  // Obtiene longitud de una cadena
     int len = 0;
     __asm {
         mov esi, cad
@@ -239,10 +218,7 @@ int lenCad(char cad[]) {
     return len;
 }
 
-
-
-
-void mezclarCadena(char cad[]) {
+void mezclarCadena(char cad[]) {  // Mezcla aleatoriamente una cadena
     __asm {
         push esi
         push edi
@@ -250,12 +226,11 @@ void mezclarCadena(char cad[]) {
 
         mov esi, cad
 
-        ; obtener longitud : lenCad(cad)
         push cad
         call lenCad
-        add esp, 4; limpiar argumento
-        mov ecx, eax; ecx = longitud
-        dec ecx; ecx = longitud - 1
+        add esp, 4
+        mov ecx, eax
+        dec ecx
 
         cmp ecx, 0
         jl mez_end
@@ -287,7 +262,7 @@ void mezclarCadena(char cad[]) {
     }
 }
 
-int leerArchivo(const char *nombre, char *buffer, int max) {
+int leerArchivo(const char *nombre, char *buffer, int max) {  // Lee contenido de archivo
     FILE *f = fopen(nombre, "r");
     if (!f) return 0;
 
@@ -298,75 +273,63 @@ int leerArchivo(const char *nombre, char *buffer, int max) {
     return n;
 }
 
-
-
-void obtenerLineaRandom(char *buffer, char *out) {
+void obtenerLineaRandom(char *buffer, char *out) {  // Obtiene una línea aleatoria del buffer
     __asm {
         mov esi, buffer
         mov edi, out
-        xor ecx, ecx               ; ECX = contador de saltos '\n'
+        xor ecx, ecx
 
-    ; ============================
-    ; CONTAR LÍNEAS
-    ; ============================
     contar_lineas:
         mov al, [esi]
         cmp al, 0
-        je fin_conteo              ; fin del buffer
+        je fin_conteo
 
-        cmp al, 0Ah                ; si es '\n'
+        cmp al, 0Ah
         jne seguir_contar
-        inc ecx                    ; contamos un salto → una línea
+        inc ecx
 
     seguir_contar:
         inc esi
         jmp contar_lineas
 
     fin_conteo:
-        inc ecx                    ; total líneas = saltos+1
+        inc ecx
 
-        ; generar índice aleatorio en [0, ecx-1]
         push ecx
         call rnd
         add esp, 4
-        mov ebx, eax               ; EBX = línea objetivo
+        mov ebx, eax
 
         mov esi, buffer
 
-    ; ============================
-    ; BUSCAR INICIO DE LA LÍNEA SELECCIONADA
-    ; ============================
     buscar_linea:
         cmp ebx, 0
         je copiar_linea
 
         mov al, [esi]
         cmp al, 0
-        je copiar_linea            ; EOF inesperado
+        je copiar_linea
 
         cmp al, 0Ah
         jne avanzar_busqueda
-        dec ebx                    ; llegó a un salto → próxima línea
+        dec ebx
 
     avanzar_busqueda:
         inc esi
         jmp buscar_linea
 
-    ; ============================
-    ; COPIAR LA LÍNEA (ignorando '\r')
-    ; ============================
     copiar_linea:
         mov al, [esi]
         cmp al, 0
         je fin
 
-        cmp al, 0Ah                ; fin de la línea
+        cmp al, 0Ah
         je fin
 
-        cmp al, 0Dh                ; ignorar '\r'
+        cmp al, 0Dh
         je ignorar_cr
 
-        mov [edi], al              ; copiar caracter
+        mov [edi], al
         inc edi
 
     ignorar_cr:
@@ -374,23 +337,23 @@ void obtenerLineaRandom(char *buffer, char *out) {
         jmp copiar_linea
 
     fin:
-        mov byte ptr [edi], 0      ; terminador
+        mov byte ptr [edi], 0
     }
 }
 
-int contarLineas(char *buffer) {
+int contarLineas(char *buffer) {  // Cuenta líneas en buffer
     int total = 0;
 
     __asm {
         mov esi, buffer
-        xor ecx, ecx    ; contador de saltos '\n' = 0
+        xor ecx, ecx
 
     cl_loop:
         mov al, [esi]
         cmp al, 0
         je cl_fin
 
-        cmp al, 0Ah     ; '\n'
+        cmp al, 0Ah
         jne cl_next
         inc ecx
 
@@ -399,63 +362,58 @@ int contarLineas(char *buffer) {
         jmp cl_loop
 
     cl_fin:
-        inc ecx         ; número real de líneas = saltos + 1
+        inc ecx
         mov total, ecx
     }
 
     return total;
 }
 
-int letraEnPosicion(char letra, const char* palabra, int posicion) {
+int letraEnPosicion(char letra, const char* palabra, int posicion) {  // Verifica letra en posición
     int resultado = 0;
     
     __asm {
-        mov al, [ebp+8]      ; char letra
-        mov esi, [ebp+12]    ; const char* palabra
-        mov ecx, [ebp+16]    ; int posicion
-        mov resultado, 0     ; resultado inicial = 0
+        mov al, [ebp+8]
+        mov esi, [ebp+12]
+        mov ecx, [ebp+16]
+        mov resultado, 0
         
-        ; Verificar si la posición es válida (no negativa)
         cmp ecx, 0
         jl fin_letraPos
         
-        ; Buscar la posición en la cadena
-        xor ebx, ebx         ; contador de posición actual
+        xor ebx, ebx
         
     buscar_posicion:
         mov dl, [esi+ebx]
         cmp dl, 0
-        je fin_letraPos      ; Fin de cadena alcanzado
+        je fin_letraPos
         
         cmp ebx, ecx
-        je verificar_letra   ; Llegamos a la posición deseada
+        je verificar_letra
         
         inc ebx
         jmp buscar_posicion
 
     verificar_letra:
-        ; Comparar la letra en esa posición
         cmp al, dl
         jne fin_letraPos
         
-        ; Coincidencia encontrada
         mov resultado, 1
         jmp fin_letraPos
 
     fin_letraPos:
-        ; El resultado ya está en la variable
     }
     
     return resultado;
 }
 
-int contarOcurrencias(char letra, const char* palabra) {
+int contarOcurrencias(char letra, const char* palabra) {  // Cuenta ocurrencias de letra
     int cuantas = 0;
     
     __asm {
-        mov al, [ebp+8]      ; char letra
-        mov esi, [ebp+12]    ; const char* palabra
-        xor ecx, ecx         ; contador = 0
+        mov al, [ebp+8]
+        mov esi, [ebp+12]
+        xor ecx, ecx
 
     ciclo_contar:
         mov dl, [esi]
@@ -465,7 +423,6 @@ int contarOcurrencias(char letra, const char* palabra) {
         cmp al, dl
         jne siguiente_char
         
-        ; Encontrada coincidencia
         inc ecx
 
     siguiente_char:
@@ -479,18 +436,17 @@ int contarOcurrencias(char letra, const char* palabra) {
     return cuantas;
 }
 
-void obtenerPista(const char* palabra, const char* palabraOculta, char* resultado) {
+void obtenerPista(const char* palabra, const char* palabraOculta, char* resultado) {  // Obtiene pista revelando letra oculta
     __asm {
         push ebx
         push edi
         push esi
         
-        mov esi, [ebp+8]     ; const char* palabra
-        mov edi, [ebp+12]    ; const char* palabraOculta
-        mov ebx, [ebp+16]    ; char* resultado
+        mov esi, [ebp+8]
+        mov edi, [ebp+12]
+        mov ebx, [ebp+16]
         
-        ; Primero, copiar palabraOculta a resultado
-        xor ecx, ecx         ; índice
+        xor ecx, ecx
         
     copiar_ciclo:
         mov al, [edi+ecx]
@@ -499,31 +455,25 @@ void obtenerPista(const char* palabra, const char* palabraOculta, char* resultad
         test al, al
         jnz copiar_ciclo
         
-        ; Ahora buscar posiciones ocultas (guiones bajos '_')
-        dec ecx              ; longitud - 1 (sin contar el null)
-        jle fin_pista        ; Si longitud <= 1, no hacer nada
+        dec ecx
+        jle fin_pista
         
-        ; Generar posición aleatoria entre 0 y ecx-1
         push ecx
         call rand
         pop ecx
         
-        ; eax contiene número aleatorio, hacer módulo ecx
         xor edx, edx
-        div ecx              ; edx = eax % ecx (posición aleatoria)
+        div ecx
         
-        ; Buscar desde la posición aleatoria una letra oculta
-        mov eax, edx         ; posición inicial aleatoria
-        xor edx, edx         ; contador de intentos
+        mov eax, edx
+        xor edx, edx
         
     buscar_oculta:
-        ; Verificar si en esta posición hay '_'
         cmp byte ptr [edi+eax], '_'
         jne siguiente_posicion
         
-        ; Encontrada posición oculta, revelar letra
-        mov cl, [esi+eax]    ; letra original
-        mov [ebx+eax], cl    ; poner en resultado
+        mov cl, [esi+eax]
+        mov [ebx+eax], cl
         jmp fin_pista
 
     siguiente_posicion:
@@ -532,12 +482,10 @@ void obtenerPista(const char* palabra, const char* palabraOculta, char* resultad
         cmp edx, ecx
         jl buscar_siguiente
         
-        ; Si llegamos aquí, buscar desde el principio
         xor eax, eax
         xor edx, edx
         
     buscar_siguiente:
-        ; Verificar si hemos revisado todas las posiciones
         cmp edx, ecx
         jl buscar_oculta
 
@@ -548,7 +496,7 @@ void obtenerPista(const char* palabra, const char* palabraOculta, char* resultad
     }
 }
 
-int cmpCadIgnoreCase(const char* cad1, const char* cad2) {
+int cmpCadIgnoreCase(const char* cad1, const char* cad2) {  // Compara cadenas ignorando mayúsculas/minúsculas
     int iguales = 1;
     
     __asm {
@@ -556,35 +504,32 @@ int cmpCadIgnoreCase(const char* cad1, const char* cad2) {
         push edi
         push esi
         
-        mov esi, [ebp+8]     ; const char* cad1
-        mov edi, [ebp+12]    ; const char* cad2
+        mov esi, [ebp+8]
+        mov edi, [ebp+12]
         
-        mov iguales, 1       ; asumir iguales
+        mov iguales, 1
 
     comparar_ciclo:
         mov al, [esi]
         mov bl, [edi]
         
-        ; Si ambos son null, fin de cadenas iguales
         test al, al
         jz verificar_fin_cad2
         test bl, bl
         jz no_iguales
         
-        ; Convertir a mayúsculas si es minúscula
         cmp al, 'a'
         jb check_cad1_upper
         cmp al, 'z'
         ja check_cad1_upper
-        sub al, 32           ; Convertir a mayúscula
+        sub al, 32
 
     check_cad1_upper:
-        ; Hacer lo mismo para bl
         cmp bl, 'a'
         jb comparar_chars
         cmp bl, 'z'
         ja comparar_chars
-        sub bl, 32           ; Convertir a mayúscula
+        sub bl, 32
 
     comparar_chars:
         cmp al, bl
@@ -595,11 +540,9 @@ int cmpCadIgnoreCase(const char* cad1, const char* cad2) {
         jmp comparar_ciclo
 
     verificar_fin_cad2:
-        ; Verificar si cad2 también terminó
         cmp byte ptr [edi], 0
         jne no_iguales
         
-        ; Cadenas iguales
         jmp salir_cmp
 
     no_iguales:
@@ -614,7 +557,7 @@ int cmpCadIgnoreCase(const char* cad1, const char* cad2) {
     return iguales;
 }
 
-void letrasUnicas(const char* palabra, char* resultado) {
+void letrasUnicas(const char* palabra, char* resultado) {  // Obtiene letras únicas de palabra
     __asm {
         push ebp
         mov ebp, esp
@@ -668,7 +611,6 @@ void letrasUnicas(const char* palabra, char* resultado) {
         cmp byte ptr [ebx+edx], 0
         je siguiente_indice
         
-        ; Agregar letra al resultado
         mov al, dl
         add al, 'A'
         mov [edi+ecx], al
@@ -689,4 +631,3 @@ void letrasUnicas(const char* palabra, char* resultado) {
         pop ebp
     }
 }
-

@@ -1,0 +1,26 @@
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:14 | Intentos (Errores): 1
+Palabra: memoria | Dificultad: Fácil | Tiempo: 00:43 | Intentos (Errores): 1
+Palabra: tres tristes tigres tragaban trigo en un trigal | Dificultad: Difícil | Tiempo: 00:24 | Intentos (Errores): 1
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:10 | Intentos (Errores/Pistas): 4
+Palabra: tres tristes tigres tragaban trigo en un trigal | Dificultad: Difícil | Tiempo: 00:14 | Intentos (Errores/Pistas): 1
+Palabra: memoria | Dificultad: Fácil | Tiempo: 00:12 | Intentos (Errores/Pistas): 1
+Palabra: memoria | Dificultad: Fácil | Tiempo: 00:15 | Intentos (Errores/Pistas): 5
+Palabra: flor | Dificultad: Fácil | Tiempo: 02:06 | Intentos (Errores): 2
+Palabra: flor | Dificultad: Fácil | Tiempo: 02:08 | Intentos (Errores): 3
+Palabra: memoria | Dificultad: Fácil | Tiempo: 00:17 | Intentos (Errores/Pistas): 2
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:04 | Intentos (Errores/Pistas): 1
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:08 | Intentos (Errores): 1
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:08 | Intentos (Errores): 1
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:09 | Intentos (Errores): 2
+Palabra: memoria | Dificultad: Fácil | Tiempo: 00:11 | Intentos (Errores): 1
+Palabra: tres tristes tigres tragaban trigo en un trigal | Dificultad: Difícil | Tiempo: 00:36 | Intentos (Errores): 1
+Palabra: flor | Dificultad: Fácil | Tiempo: 00:05 | Intentos (Errores): 1
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:33 | Intentos (Errores): 1
+Palabra: flor | Dificultad: Fácil | Tiempo: 00:17 | Intentos (Errores): 1
+Palabra: memoria | Dificultad: Fácil | Tiempo: 00:04 | Intentos (Errores): 1
+Palabra: flor | Dificultad: Fácil | Tiempo: 00:28 | Intentos (Errores): 2
+Palabra: tres tristes tigres tragaban trigo en un trigal | Dificultad: Difícil | Tiempo: 00:12 | Intentos (Errores): 1
+Palabra: ninja | Dificultad: Fácil | Tiempo: 00:04 | Intentos (Errores): 1
+Palabra: flor | Dificultad: Fácil | Tiempo: 00:03 | Intentos (Errores): 1
+Palabra: Tiempo | Dificultad: Medio | Tiempo: 00:07 | Intentos (Errores): 1
+Palabra: Tiempo | Dificultad: Medio | Tiempo: 01:04 | Intentos (Errores): 2
