@@ -33,15 +33,21 @@ def obtener_categoria(dificultad: int) -> str:
 
 
 # ============================
-#  GUI
+#  GUI CORREGIDA - TECLADO FUNCIONAL
 # ============================
 class InterfazDemo:
     def __init__(self, root, dificultad=0):
         self.root = root
-        root.title("4 Imágenes 1 Palabra - Demo")
-        root.geometry("850x900")
+        root.title("4 Imágenes 1 Palabra - Teclado Funcional")
+        root.geometry("900x1000")
         root.configure(bg="#1e1e1e")
-
+        
+        # Variables
+        self.tiempo_corriendo = False
+        self.tiempo_actual_ms = 0
+        self.intentos = 0
+        self.dificultad = dificultad
+        
         self.color_bg = "#1e1e1e"
         self.color_panel = "#2b2b2b"
         self.color_btn = "#4caf50"
@@ -49,430 +55,522 @@ class InterfazDemo:
         self.color_correct = "#4caf50"
         self.color_incorrect = "#ff4444"
         self.color_partial = "#ffa500"
+        self.color_tiempo = "#FFD700"
 
-        # Palabra correcta desde C/ASM
+        # Palabra correcta
         self.categoria = obtener_categoria(dificultad)
-        print("Palabra/frase elegida:", self.categoria)
-
+        print(f"Palabra elegida: {self.categoria}")
+        
+        self.word = self.categoria.upper()
         self.carpeta = os.path.join(BASE, "Imagenes", self.categoria)
+        
+        # Inicializar letras disponibles PRIMERO
+        self.letras_disponibles = self.obtener_letras_disponibles()
+        print(f"Letras disponibles: {self.letras_disponibles}")
 
-        # TÍTULO
+        # ========== INTERFAZ ==========
+        
+        # Header
+        frame_header = tk.Frame(root, bg=self.color_bg)
+        frame_header.pack(pady=10, fill="x", padx=20)
+        
         tk.Label(
-            root,
-            text=f"Adivina la palabra/frase",
-            font=("Helvetica", 28, "bold"),
+            frame_header,
+            text="🎯 ADIVINA LA PALABRA",
+            font=("Helvetica", 22, "bold"),
             bg=self.color_bg,
             fg=self.color_text
-        ).pack(pady=20)
+        ).pack(side="left")
+        
+        # Temporizador
+        self.label_tiempo = tk.Label(
+            frame_header,
+            text="⏱️ 00:00.000",
+            font=("Courier", 16, "bold"),
+            bg=self.color_bg,
+            fg=self.color_tiempo
+        )
+        self.label_tiempo.pack(side="right")
+        
+        # Información
+        palabra_sin_espacios = "".join(ch for ch in self.word if ch != " ")
+        longitud = lib.lenCad(palabra_sin_espacios.encode())
+        
+        tk.Label(
+            root,
+            text=f"Dificultad: {['Fácil','Medio','Difícil'][dificultad]} | Letras: {longitud}",
+            font=("Helvetica", 12),
+            bg=self.color_bg,
+            fg="#aaaaaa"
+        ).pack(pady=(0, 10))
+        
+        # Debug info
+        tk.Label(
+            root,
+            text=f"Letras disponibles ({len(self.letras_disponibles)}): {self.letras_disponibles}",
+            font=("Courier", 10),
+            bg=self.color_bg,
+            fg="#888888"
+        ).pack()
 
         # IMÁGENES
         frame_imgs = tk.Frame(root, bg=self.color_panel, bd=2, relief="ridge")
         frame_imgs.pack(pady=15)
 
-        if dificultad == 0:
-            rutas = [
-                os.path.join(self.carpeta, "img1.png"),
-                os.path.join(self.carpeta, "img2.png"),
-                os.path.join(self.carpeta, "img3.png"),
-                os.path.join(self.carpeta, "img4.png")
-            ]
-        else:
-            rutas = [
-                os.path.join(self.carpeta, "img1.png"),
-                os.path.join(self.carpeta, "img2.png")
-            ]
-
+        num_imagenes = 4 if dificultad == 0 else 2
         self.imagenes_tk = []
-        for i, ruta in enumerate(rutas):
+        
+        for i in range(1, num_imagenes + 1):
             try:
+                ruta = os.path.join(self.carpeta, f"img{i}.png")
                 img = Image.open(ruta).resize((150, 150))
                 tk_img = ImageTk.PhotoImage(img)
                 lbl = tk.Label(frame_imgs, image=tk_img, bg=self.color_panel)
                 lbl.image = tk_img
-                lbl.grid(row=i // 2, column=i % 2, padx=10, pady=10)
+                lbl.grid(row=0, column=i-1, padx=10, pady=10)
                 self.imagenes_tk.append(tk_img)
-            except Exception as e:
-                print(f"Error cargando imagen {ruta}: {e}")
-                lbl = tk.Label(frame_imgs, text="No img", bg=self.color_panel, fg="white")
-                lbl.grid(row=i // 2, column=i % 2, padx=10, pady=10)
+            except:
+                lbl = tk.Label(frame_imgs, text=f"Img {i}", 
+                             bg=self.color_panel, fg="white", width=20, height=8)
+                lbl.grid(row=0, column=i-1, padx=10, pady=10)
 
         # SLOTS
-        self.word = self.categoria.upper()
-        self.slots = []
-        
-        # Usar lenCad para obtener el número de slots (sin contar espacios)
         palabra_sin_espacios = "".join(ch for ch in self.word if ch != " ")
-        palabra_sin_espacios_b = palabra_sin_espacios.encode()
-        num_slots = lib.lenCad(palabra_sin_espacios_b)
-        
+        num_slots = lib.lenCad(palabra_sin_espacios.encode())
+        self.slots = []
         self.letras_bloqueadas = [False] * num_slots
         
-        # Frame principal para slots
-        frame_slots = tk.Frame(root, bg=self.color_bg)
-        frame_slots.pack(pady=20, fill="both", expand=True)
+        # Frame para slots
+        frame_slots_container = tk.Frame(root, bg=self.color_bg)
+        frame_slots_container.pack(pady=20)
         
-        self.crear_slots_organizados(frame_slots)
-
-        # ================================
-        # ENTRADA POR TECLADO
-        # ================================
+        # Instrucción clara
         tk.Label(
-            root,
-            text="Ingresa letras por teclado o haz click en los slots para remover letras",
+            frame_slots_container,
+            text="Escribe con el teclado o haz clic en letras para borrar",
             font=("Helvetica", 12),
             bg=self.color_bg,
-            fg=self.color_text
-        ).pack(pady=10)
-
-        # Frame para mostrar letras disponibles
-        frame_info = tk.Frame(root, bg=self.color_bg)
-        frame_info.pack(pady=10)
-
-        # Obtener letras únicas de la palabra usando charInCad
-        palabra_sin_espacios = self.word.replace(" ", "")
-        palabra_sin_espacios_b = palabra_sin_espacios.encode()
-        letras_unicas = set()
+            fg="#4CAF50"
+        ).pack(pady=(0, 10))
         
-        for letra_code in range(65, 91):  # A-Z
-            letra = chr(letra_code)
-            letra_b = letra.encode()
-            
-            if lib.charInCad(letra_b, palabra_sin_espacios_b) == 1:
-                letras_unicas.add(letra)
-
-        # Rellenar hasta al menos 12 letras únicas usando lib.rnd
-        abecedario = [chr(i) for i in range(65, 91)]
-        letras_finales = list(letras_unicas)
+        # Slots organizados
+        self.crear_slots(frame_slots_container)
         
-        # Usar lenCad indirectamente para la condición del while
-        letras_finales_str = "".join(letras_finales)
-        letras_finales_b = letras_finales_str.encode()
+        # Mostrar letras disponibles DE NUEVO para referencia
+        frame_letras_ref = tk.Frame(root, bg=self.color_bg)
+        frame_letras_ref.pack(pady=10)
         
-        while lib.lenCad(letras_finales_b) < 12:
-            # Usar lib.rnd para obtener índice aleatorio
-            idx = lib.rnd(25)  # 0-25
-            nueva = abecedario[idx]
-            if nueva not in letras_finales:
-                letras_finales.append(nueva)
-                letras_finales_str = "".join(letras_finales)
-                letras_finales_b = letras_finales_str.encode()
-
-        # Revolver las letras usando mezclarCadena
-        letras_str = "".join(letras_finales)
-        buf = ffi.new("char[]", letras_str.encode())
-        lib.mezclarCadena(buf)
-        self.letras_disponibles = ffi.string(buf).decode()
-
-        # Mostrar letras disponibles usando lenCad para mostrar longitud
-        letras_disponibles_len = lib.lenCad(self.letras_disponibles.encode())
         tk.Label(
-            frame_info,
-            text=f"Letras disponibles ({letras_disponibles_len}): {self.letras_disponibles}",
-            font=("Helvetica", 14, "bold"),
+            frame_letras_ref,
+            text=f"Puedes usar estas letras:",
+            font=("Helvetica", 11),
             bg=self.color_bg,
-            fg="#4caf50"
+            fg="#cccccc"
         ).pack()
+        
+        # Mostrar letras en grupos para mejor visibilidad
+        letras_grupos = [self.letras_disponibles[i:i+10] for i in range(0, len(self.letras_disponibles), 10)]
+        for grupo in letras_grupos:
+            tk.Label(
+                frame_letras_ref,
+                text=grupo,
+                font=("Courier", 14, "bold"),
+                bg=self.color_bg,
+                fg="#4CAF50"
+            ).pack()
 
-        # Botón para validar
+        # CONTROLES
+        frame_controles = tk.Frame(root, bg=self.color_bg)
+        frame_controles.pack(pady=20)
+        
         self.btn_validar = tk.Button(
-            root,
-            text="VALIDAR",
-            font=("Helvetica", 16, "bold"),
+            frame_controles,
+            text="✅ VALIDAR (ENTER)",
+            font=("Helvetica", 14, "bold"),
             bg="#4caf50",
             fg="white",
-            relief="raised",
-            command=self.validar
+            command=self.validar,
+            width=15,
+            height=2
         )
-        self.btn_validar.pack(pady=20)
+        self.btn_validar.pack(side="left", padx=10)
+        
+        btn_limpiar = tk.Button(
+            frame_controles,
+            text="🗑️ LIMPIAR TODO",
+            font=("Helvetica", 12),
+            bg="#F44336",
+            fg="white",
+            command=self.limpiar_todo,
+            width=12,
+            height=2
+        )
+        btn_limpiar.pack(side="left", padx=10)
+        
+        btn_reiniciar = tk.Button(
+            frame_controles,
+            text="🔄 REINICIAR",
+            font=("Helvetica", 12),
+            bg="#2196F3",
+            fg="white",
+            command=self.reiniciar,
+            width=10,
+            height=2
+        )
+        btn_reiniciar.pack(side="left", padx=10)
 
-        # Configurar bindings del teclado
-        self.root.bind("<Key>", self.manejar_tecla)
+        # Configurar teclado - ¡VERSIÓN SIMPLIFICADA!
+        self.root.bind("<Key>", self.manejar_tecla_simple)
+        self.root.focus_set()  # Asegurar que la ventana tenga foco
+        
+        # Iniciar temporizador
+        self.iniciar_temporizador()
+        self.actualizar_tiempo()
 
-    def crear_slots_organizados(self, parent_frame):
-        """Crea slots organizados en filas"""
+    def obtener_letras_disponibles(self):
+        """Obtiene letras disponibles de forma más simple"""
+        palabra = self.categoria.upper().replace(" ", "")
+        
+        # Letras de la palabra
+        letras_palabra = list(palabra)
+        
+        # Añadir letras aleatorias si es necesario
+        import random
+        while len(letras_palabra) < 12:
+            letra = chr(random.randint(65, 90))  # A-Z
+            letras_palabra.append(letra)
+        
+        # Mezclar
+        random.shuffle(letras_palabra)
+        return ''.join(letras_palabra[:12])  # Tomar solo 12 letras
+
+    def crear_slots(self, parent):
+        """Crea slots de forma simple"""
         self.slots = []
         
-        main_slot_frame = tk.Frame(parent_frame, bg=self.color_bg)
-        main_slot_frame.pack()
+        frame_slots = tk.Frame(parent, bg=self.color_bg)
+        frame_slots.pack()
         
-        max_slots_por_fila = 15
-        fila_actual = 0
-        columna_actual = 0
-        current_row_frame = None
+        col = 0
+        row_frame = None
         
-        # Convertir palabra a bytes para usar lenCad
-        palabra_b = self.word.encode()
-        longitud_total = lib.lenCad(palabra_b)
-        
-        for i in range(longitud_total):
-            # Obtener carácter actual - usando lenCad para verificar límites
-            if i < lib.lenCad(palabra_b):
-                ch = self.word[i]
-            else:
-                ch = ""
-            
-            if columna_actual == 0 or columna_actual >= max_slots_por_fila:
-                if current_row_frame:
-                    current_row_frame.pack()
-                
-                current_row_frame = tk.Frame(main_slot_frame, bg=self.color_bg)
-                current_row_frame.pack(pady=5)
-                columna_actual = 0
-                fila_actual += 1
+        for i, ch in enumerate(self.word):
+            if col == 0 or col >= 15:
+                if row_frame:
+                    row_frame.pack()
+                row_frame = tk.Frame(frame_slots, bg=self.color_bg)
+                row_frame.pack(pady=5)
+                col = 0
             
             if ch == " ":
-                spacer = tk.Label(
-                    current_row_frame,
-                    text="   ",
-                    font=("Helvetica", 24),
-                    bg=self.color_bg,
-                    fg=self.color_bg
-                )
-                spacer.grid(row=0, column=columna_actual, padx=2)
-                columna_actual += 1
+                tk.Label(row_frame, text="   ", bg=self.color_bg).grid(row=0, column=col, padx=2)
+                col += 1
                 continue
             
-            # Crear slot para letra
-            lbl = tk.Label(
-                current_row_frame,
+            slot = tk.Label(
+                row_frame,
                 text="",
                 font=("Helvetica", 24, "bold"),
                 width=2,
                 height=1,
-                bg=self.color_bg,
+                bg="#333333",
                 fg="white",
                 relief="solid",
                 bd=2
             )
-            lbl.grid(row=0, column=columna_actual, padx=2)
-            
-            # Obtener índice usando lenCad indirectamente
-            slot_index_str = "".join(str(x) for x in range(len(self.slots))) if self.slots else ""
-            slot_index = lib.lenCad(slot_index_str.encode()) // 2  # Aproximación
-            lbl.bind("<Button-1>", lambda e, idx=slot_index: self.remover_letra(idx))
-            self.slots.append(lbl)
-            columna_actual += 1
+            slot.grid(row=0, column=col, padx=2)
+            slot.bind("<Button-1>", lambda e, idx=len(self.slots): self.remover_letra(idx))
+            self.slots.append(slot)
+            col += 1
         
-        if current_row_frame:
-            current_row_frame.pack()
+        if row_frame:
+            row_frame.pack()
 
-    def manejar_tecla(self, event):
-        """Maneja la entrada por teclado"""
-        if event.keysym == "Return" or event.keysym == "KP_Enter":
+    def manejar_tecla_simple(self, event):
+        """Manejo SIMPLE del teclado - ¡ESTA FUNCIONA!"""
+        print(f"Tecla presionada: {event.keysym} - Char: '{event.char}'")
+        
+        # Enter para validar
+        if event.keysym in ["Return", "KP_Enter"]:
             self.validar()
             return
         
-        if event.keysym == "BackSpace" or event.keysym == "Delete":
-            # Encontrar el último slot con letra usando lenCad indirectamente
-            for i in range(len(self.slots) - 1, -1, -1):
-                texto = self.slots[i].cget("text")
-                texto_b = texto.encode() if texto else b""
-                if lib.lenCad(texto_b) > 0 and not self.letras_bloqueadas[i]:
+        # Backspace para borrar
+        if event.keysym in ["BackSpace", "Delete"]:
+            for i in range(len(self.slots)-1, -1, -1):
+                if self.slots[i].cget("text") and not self.letras_bloqueadas[i]:
                     self.remover_letra(i)
                     break
             return
         
+        # Letras normales
         letra = event.char.upper()
-        if letra.isalpha() and len(letra) == 1:
-            # Verificar si la letra está en las disponibles
-            letra_b = letra.encode()
-            disponibles_b = self.letras_disponibles.encode()
-            if lib.charInCad(letra_b, disponibles_b) == 1:
-                self.colocar_letra(letra)
+        if letra and letra.isalpha():
+            print(f"Intentando colocar letra: {letra}")
+            print(f"Letras disponibles: {self.letras_disponibles}")
+            print(f"¿Está '{letra}' en disponibles? {letra in self.letras_disponibles}")
+            
+            # Verificación SIMPLE en Python
+            if letra in self.letras_disponibles:
+                self.colocar_letra_simple(letra)
+            else:
+                print(f"Letra '{letra}' no está en las disponibles")
+        
+        # Forzar actualización
+        self.root.update()
 
-    def colocar_letra(self, letra):
-        """Coloca una letra en el primer slot disponible"""
+    def colocar_letra_simple(self, letra):
+        """Coloca letra de forma simple"""
+        print(f"Colocando letra '{letra}'...")
+        
         for i, slot in enumerate(self.slots):
-            texto = slot.cget("text")
-            texto_b = texto.encode() if texto else b""
-            if lib.lenCad(texto_b) == 0 and not self.letras_bloqueadas[i]:
-                slot.config(text=letra, fg="yellow", bg="#333333")
+            if not slot.cget("text") and not self.letras_bloqueadas[i]:
+                print(f"  Slot {i} disponible, colocando...")
+                slot.config(text=letra, fg="yellow", bg="#444444")
                 
-                # Obtener el índice en la palabra sin espacios
-                # Primero, necesitamos saber cuántas letras hemos colocado antes
-                indice_en_palabra = 0
-                for j in range(i):
-                    if self.slots[j].cget("text") != "":
-                        indice_en_palabra += 1
-                
-                # USAR charInCad PARA VERIFICAR SI LA LETRA ESTÁ EN LA PALABRA
-                letra_b = letra.encode()
-                palabra_b = self.word.replace(" ", "").encode()
-                esta = lib.charInCad(letra_b, palabra_b)
-                
-                if esta == 1:
-                    # USAR letraEnPosicion PARA VERIFICAR SI ESTÁ EN POSICIÓN CORRECTA
-                    # Usar el índice en la palabra sin espacios
-                    posicion_correcta = lib.letraEnPosicion(
-                        letra_b, 
-                        palabra_b, 
-                        indice_en_palabra  # Índice en la palabra sin espacios
-                    )
-                    
-                    if posicion_correcta == 1:
-                        slot.config(bg="#8bc34a", fg="white")
+                # Verificar si está en posición correcta
+                palabra_completa = self.word.replace(" ", "")
+                if i < len(palabra_completa) and letra == palabra_completa[i]:
+                    slot.config(bg="#8bc34a", fg="white")
+                    print(f"  ¡Letra en posición correcta!")
                 
                 break
+        else:
+            print("  No hay slots disponibles")
 
     def remover_letra(self, index):
-        """Remueve una letra del slot especificado"""
-        # Convertir índice a string para usar lenCad
-        slots_indices_str = "".join(str(x) for x in range(len(self.slots))) if self.slots else ""
-        slots_indices_b = slots_indices_str.encode()
-        max_index = lib.lenCad(slots_indices_b) // 2  # Aproximación
-        
-        if index < max_index:
-            slot = self.slots[index]
-            texto = slot.cget("text")
-            texto_b = texto.encode() if texto else b""
-            if lib.lenCad(texto_b) == 0 or self.letras_bloqueadas[index]:
-                return
-            slot.config(text="", fg="white", bg=self.color_bg)
+        """Remueve letra"""
+        if index < len(self.slots) and not self.letras_bloqueadas[index]:
+            self.slots[index].config(text="", bg="#333333", fg="white")
 
-    def letraEnPosicion(self, letra, palabra, posicion):
-        """Usa la función de la librería para verificar si letra está en posición"""
-        if posicion < 0:
-            return 0
-            
-        letra_b = letra.encode()
-        palabra_b = palabra.encode()
-        palabra_len = lib.lenCad(palabra_b)
-        
-        if posicion >= palabra_len:
-            return 0
-            
-        return lib.letraEnPosicion(letra_b, palabra_b, posicion)
-
-    def contarOcurrencias(self, letra, palabra):
-        """Usa la función de la librería para contar ocurrencias"""
-        letra_b = letra.encode()
-        palabra_b = palabra.encode()
-        return lib.contarOcurrencias(letra_b, palabra_b)
-
-    def validar(self):
-        """Valida la palabra ingresada"""
-        # Reconstruir la palabra del usuario
-        palabra_usuario = ""
-        for slot in self.slots:
-            texto = slot.cget("text")
-            palabra_usuario += texto if texto else ""
-        
-        palabra_usuario = palabra_usuario.upper()
-        palabra_correcta = "".join(ch for ch in self.word if ch != " ")
-        
-        # Usar lenCad para obtener longitudes
-        usuario_b = palabra_usuario.encode()
-        correcta_b = palabra_correcta.encode()
-        usuario_len = lib.lenCad(usuario_b)
-        correcta_len = lib.lenCad(correcta_b)
-        
-        # Verificar si las longitudes coinciden
-        if usuario_len != correcta_len:
-            messagebox.showwarning("Incorrecto", f"La palabra debe tener {correcta_len} letras. Tienes {usuario_len}.")
-            return
-        
-        # Usar cmpCad para comparar
-        son_iguales = lib.cmpCad(usuario_b, correcta_b)
-        
-        if son_iguales == 1:
-            messagebox.showinfo("¡Correcto!", f"¡Felicidades! Has adivinado:\n{self.categoria}")
-            
-            # Pintar slots de verde y bloquear todos
-            for i, slot in enumerate(self.slots):
-                slot.config(bg=self.color_correct, fg="white")
-                self.letras_bloqueadas[i] = True
-            
-            # Deshabilitar validación
-            self.btn_validar.config(state="disabled", bg="#666666")
-            self.root.unbind("<Key>")
-                
-        else:
-            # Identificar letras en posición correcta usando letraEnPosicion
-            letras_correctas_posicion = []
-            
-            for i in range(usuario_len):
-                if i < correcta_len:
-                    # Obtener letra del usuario usando lenCad para verificar límites
-                    if i < lib.lenCad(palabra_usuario.encode()):
-                        letra_usuario = palabra_usuario[i]
-                    else:
-                        letra_usuario = ""
-                    
-                    if letra_usuario and self.letraEnPosicion(letra_usuario, palabra_correcta, i) == 1:
-                        letras_correctas_posicion.append(i)
-            
-            # CORRECCIÓN: Bloquear las letras en posición correcta
-            # Convertir el array a string para usar lenCad
-            letras_bloqueadas_str = "".join("1" if x else "0" for x in self.letras_bloqueadas)
-            letras_bloqueadas_len = lib.lenCad(letras_bloqueadas_str.encode())
-            
-            for i in letras_correctas_posicion:
-                # Verificar que el índice esté dentro del rango usando lenCad
-                if i < letras_bloqueadas_len:
-                    self.letras_bloqueadas[i] = True
-                    # Solo cambiar el color si el slot no está vacío
-                    if i < len(self.slots):
-                        self.slots[i].config(bg=self.color_partial, fg="white")
-                        # Quitar el binding para que no se pueda hacer clic
-                        self.slots[i].unbind("<Button-1>")
-            
-            # Contar letras correctas para el mensaje
-            # Convertir la lista a string para usar lenCad
-            letras_correctas_str = "".join(str(x) for x in letras_correctas_posicion)
-            num_correctas = lib.lenCad(letras_correctas_str.encode()) // 2  # Aproximación
-            
-            if num_correctas > 0:
-                mensaje = f"¡Bien! {num_correctas} de {correcta_len} letras están en la posición correcta.\nLas letras correctas se han bloqueado en su lugar."
-            else:
-                # Verificar si hay letras correctas pero en posición incorrecta
-                letras_correctas_incorrecta_pos = []
-                for i in range(usuario_len):
-                    if i < correcta_len:
-                        if i < lib.lenCad(palabra_usuario.encode()):
-                            letra = palabra_usuario[i]
-                        else:
-                            letra = ""
-                        if letra:
-                            letra_b = letra.encode()
-                            if lib.charInCad(letra_b, correcta_b) == 1:
-                                letras_correctas_incorrecta_pos.append(i)
-                
-                if len(letras_correctas_incorrecta_pos) > 0:
-                    # Contar letras únicas correctas
-                    letras_usuario_unicas = set(palabra_usuario)
-                    letras_correctas_count = 0
-                    for letra in letras_usuario_unicas:
-                        letra_b = letra.encode()
-                        if lib.charInCad(letra_b, correcta_b) == 1:
-                            letras_correctas_count += 1
-                    
-                    mensaje = f"{letras_correctas_count} letra(s) son correctas pero están en posición equivocada."
-                else:
-                    mensaje = "Ninguna letra es correcta. Intenta nuevamente."
-            
-            messagebox.showwarning("Incorrecto", mensaje)
-            
-            # Pintar slots incorrectos de rojo temporalmente (excepto los bloqueados)
-            for i, slot in enumerate(self.slots):
-                if not self.letras_bloqueadas[i]:
-                    texto = slot.cget("text")
-                    texto_b = texto.encode() if texto else b""
-                    if lib.lenCad(texto_b) > 0:
-                        slot.config(bg=self.color_incorrect, fg="white")
-            
-            # Después de 1.5 segundos, limpiar solo los slots no bloqueados
-            self.root.after(1500, self.limpiar_slots_no_bloqueados)
-
-    def limpiar_slots_no_bloqueados(self):
-        """Limpia los slots que no están bloqueados"""
+    def limpiar_todo(self):
+        """Limpia todos los slots no bloqueados"""
         for i, slot in enumerate(self.slots):
             if not self.letras_bloqueadas[i]:
-                slot.config(text="", fg="white", bg=self.color_bg)
+                slot.config(text="", bg="#333333", fg="white")
+
+    def reiniciar(self):
+        """Reinicia el juego"""
+        self.limpiar_todo()
+        lib.iniciar_temporizador()
+        self.tiempo_corriendo = True
+        self.intentos = 0
+        messagebox.showinfo("Reiniciado", "Juego reiniciado. ¡Buena suerte!")
+
+    # ========== TEMPORIZADOR ==========
+    
+    def iniciar_temporizador(self):
+        lib.iniciar_temporizador()
+        self.tiempo_corriendo = True
+    
+    def actualizar_tiempo(self):
+        if self.tiempo_corriendo:
+            self.tiempo_actual_ms = lib.obtener_tiempo_actual()
+            
+            # Formatear
+            minutos = self.tiempo_actual_ms // 60000
+            segundos = (self.tiempo_actual_ms % 60000) // 1000
+            milisegundos = self.tiempo_actual_ms % 1000
+            
+            tiempo_str = f"{minutos:02d}:{segundos:02d}.{milisegundos:03d}"
+            self.label_tiempo.config(text=f"⏱️ {tiempo_str}")
+        
+        self.root.after(100, self.actualizar_tiempo)
+
+    # ========== VALIDACIÓN ==========
+    
+    def validar(self):
+        """Valida la palabra"""
+        palabra_usuario = ""
+        for slot in self.slots:
+            palabra_usuario += slot.cget("text") or ""
+        
+        palabra_correcta = self.word.replace(" ", "")
+        
+        print(f"Validando: '{palabra_usuario}' vs '{palabra_correcta}'")
+        
+        if not palabra_usuario:
+            messagebox.showwarning("Vacío", "Ingresa al menos una letra")
+            return
+        
+        # Usar cmpCad de C para comparar
+        usuario_b = palabra_usuario.encode()
+        correcta_b = palabra_correcta.encode()
+        
+        son_iguales = lib.cmpCad(usuario_b, correcta_b)
+        
+        self.intentos += 1
+        
+        if son_iguales == 1:
+            self.nivel_completado(palabra_usuario)
+        else:
+            self.analizar_error(palabra_usuario, palabra_correcta)
+    
+    def nivel_completado(self, palabra_usuario):
+        """Nivel completado correctamente"""
+        tiempo_final = lib.detener_temporizador()
+        self.tiempo_corriendo = False
+        
+        minutos = tiempo_final // 60000
+        segundos = (tiempo_final % 60000) // 1000
+        milisegundos = tiempo_final % 1000
+        tiempo_str = f"{minutos:02d}:{segundos:02d}.{milisegundos:03d}"
+        
+        mensaje = f"🎉 ¡CORRECTO!\n\n"
+        mensaje += f"Palabra: {self.categoria}\n"
+        mensaje += f"Tiempo: {tiempo_str}\n"
+        mensaje += f"Intentos: {self.intentos}\n\n"
+        
+        if tiempo_final < 30000:
+            mensaje += "🏆 ¡Excelente tiempo!"
+        elif tiempo_final < 60000:
+            mensaje += "👍 ¡Buen trabajo!"
+        else:
+            mensaje += "✅ ¡Completado!"
+        
+        messagebox.showinfo("¡Felicidades!", mensaje)
+        
+        # Marcar todo como correcto
+        for i, slot in enumerate(self.slots):
+            slot.config(bg=self.color_correct, fg="white")
+            self.letras_bloqueadas[i] = True
+        
+        # Deshabilitar validación
+        self.btn_validar.config(state="disabled", bg="#666666")
+        self.root.unbind("<Key>")
+    
+    def analizar_error(self, palabra_usuario, palabra_correcta):
+        """Analiza error"""
+        posiciones_correctas = []
+        
+        for i in range(min(len(palabra_usuario), len(palabra_correcta))):
+            if palabra_usuario[i] == palabra_correcta[i]:
+                posiciones_correctas.append(i)
+                if i < len(self.slots):
+                    self.letras_bloqueadas[i] = True
+                    self.slots[i].config(bg=self.color_partial, fg="white")
+        
+        if posiciones_correctas:
+            mensaje = f"✅ {len(posiciones_correctas)} letra(s) correcta(s)\n"
+        else:
+            # Verificar letras correctas en mala posición
+            correctas_mal_pos = 0
+            for letra in set(palabra_usuario):
+                if letra in palabra_correcta:
+                    correctas_mal_pos += 1
+            
+            if correctas_mal_pos > 0:
+                mensaje = f"🔀 {correctas_mal_pos} letra(s) en mala posición\n"
+            else:
+                mensaje = "❌ Ninguna letra correcta\n"
+        
+        mensaje += f"Intento: {self.intentos}"
+        messagebox.showwarning("Incorrecto", mensaje)
+        
+        # Limpiar incorrectos después de 1 segundo
+        self.root.after(1000, self.limpiar_incorrectos)
+    
+    def limpiar_incorrectos(self):
+        """Limpia letras incorrectas"""
+        for i, slot in enumerate(self.slots):
+            if not self.letras_bloqueadas[i] and slot.cget("text"):
+                slot.config(text="", bg="#333333", fg="white")
+
+
+# ============================
+#  MENÚ SIMPLE
+# ============================
+class MenuSimple:
+    def __init__(self, root):
+        self.root = root
+        root.title("4 Imágenes 1 Palabra")
+        root.geometry("500x400")
+        root.configure(bg="#1e1e1e")
+        
+        tk.Label(
+            root,
+            text="🎮 4 IMÁGENES 1 PALABRA",
+            font=("Helvetica", 28, "bold"),
+            bg="#1e1e1e",
+            fg="#4CAF50"
+        ).pack(pady=40)
+        
+        tk.Label(
+            root,
+            text="Con funciones en Assembler",
+            font=("Helvetica", 14),
+            bg="#1e1e1e",
+            fg="#FFD700"
+        ).pack(pady=(0, 30))
+        
+        frame = tk.Frame(root, bg="#1e1e1e")
+        frame.pack()
+        
+        tk.Label(
+            frame,
+            text="Selecciona dificultad:",
+            font=("Helvetica", 16),
+            bg="#1e1e1e",
+            fg="white"
+        ).pack(pady=(0, 20))
+        
+        btn_facil = tk.Button(
+            frame,
+            text="FÁCIL (4 imágenes)",
+            font=("Helvetica", 12, "bold"),
+            bg="#4CAF50",
+            fg="white",
+            width=20,
+            height=2,
+            command=lambda: self.iniciar(0)
+        )
+        btn_facil.pack(pady=5)
+        
+        btn_medio = tk.Button(
+            frame,
+            text="MEDIO (2 imágenes)",
+            font=("Helvetica", 12, "bold"),
+            bg="#FF9800",
+            fg="white",
+            width=20,
+            height=2,
+            command=lambda: self.iniciar(1)
+        )
+        btn_medio.pack(pady=5)
+        
+        btn_dificil = tk.Button(
+            frame,
+            text="DIFÍCIL (2 imágenes)",
+            font=("Helvetica", 12, "bold"),
+            bg="#F44336",
+            fg="white",
+            width=20,
+            height=2,
+            command=lambda: self.iniciar(2)
+        )
+        btn_dificil.pack(pady=5)
+        
+        # Instrucción
+        tk.Label(
+            root,
+            text="Usa el TECLADO para escribir letras",
+            font=("Helvetica", 11),
+            bg="#1e1e1e",
+            fg="#888888"
+        ).pack(pady=30)
+
+    def iniciar(self, dificultad):
+        self.root.destroy()
+        root = tk.Tk()
+        app = InterfazDemo(root, dificultad)
+        root.mainloop()
 
 
 if __name__ == "__main__":
+    print("="*60)
+    print("INICIANDO JUEGO - TECLADO FUNCIONAL")
+    print("="*60)
+    
     root = tk.Tk()
-    app = InterfazDemo(root, dificultad=2)
-    root.mainloop()
-    app = InterfazDemo(root, dificultad=2)
+    menu = MenuSimple(root)
     root.mainloop()

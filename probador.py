@@ -195,7 +195,7 @@ def simular_juego():
     
     # 2. Simular tiempo de pensamiento
     print("   🤔 Jugador pensando...")
-    time.sleep(2.3)  # 2.3 segundos pensando
+    time.sleep(7.3)  # 2.3 segundos pensando
     
     # 3. Mostrar tiempo transcurrido
     tiempo_pensamiento = lib.obtener_tiempo_actual()
