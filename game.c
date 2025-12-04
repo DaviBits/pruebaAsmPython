@@ -513,14 +513,10 @@ void letrasUnicas(const char* palabra, char* resultado) {
         push edi
         push esi
         
-        mov esi, [ebp+8]     ; const char* palabra
-        mov edi, [ebp+12]    ; char* resultado
-        
-        ; Tabla de presencia de letras (26 letras) en la pila
-        sub esp, 26          ; Reservar espacio en pila
-        mov ebx, esp         ; ebx apunta a la tabla
-        
-        ; Inicializar tabla con ceros
+        mov esi, [ebp+8]
+        mov edi, [ebp+12]
+        sub esp, 26
+        mov ebx, esp
         xor eax, eax
         mov ecx, 26
         mov edx, ebx
