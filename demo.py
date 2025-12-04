@@ -229,6 +229,13 @@ class InterfazDemo:
             if slot.cget("text") == "" and not self.letras_bloqueadas[i]:
                 slot.config(text=letra, fg="yellow", bg="#333333")
                 
+                # Obtener el índice en la palabra sin espacios
+                # Primero, necesitamos saber cuántas letras hemos colocado antes
+                indice_en_palabra = 0
+                for j in range(i):
+                    if self.slots[j].cget("text") != "":
+                        indice_en_palabra += 1
+                
                 # USAR charInCad PARA VERIFICAR SI LA LETRA ESTÁ EN LA PALABRA
                 letra_b = letra.encode()
                 palabra_b = self.word.replace(" ", "").encode()
@@ -236,25 +243,17 @@ class InterfazDemo:
                 
                 if esta == 1:
                     # USAR letraEnPosicion PARA VERIFICAR SI ESTÁ EN POSICIÓN CORRECTA
+                    # Usar el índice en la palabra sin espacios
                     posicion_correcta = lib.letraEnPosicion(
                         letra_b, 
                         palabra_b, 
-                        i
+                        indice_en_palabra  # Índice en la palabra sin espacios
                     )
                     
                     if posicion_correcta == 1:
                         slot.config(bg="#8bc34a", fg="white")
                 
                 break
-
-        # Validar si todos los slots están llenos
-        slots_llenos = all(
-            slot.cget("text") != "" or self.letras_bloqueadas[i] 
-            for i, slot in enumerate(self.slots)
-        )
-        
-        if slots_llenos:
-            self.validar()
 
     # ===================================
     # QUITAR LETRA
