@@ -607,30 +607,31 @@ static void *_cffi_types[] = {
 /* 29 */ _CFFI_OP(_CFFI_OP_FUNCTION, 10), // int()(int)
 /* 30 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
 /* 31 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 32 */ _CFFI_OP(_CFFI_OP_FUNCTION, 55), // void()(char *)
-/* 33 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 34 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 35 */ _CFFI_OP(_CFFI_OP_FUNCTION, 55), // void()(char *, char *)
-/* 36 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 37 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 38 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 39 */ _CFFI_OP(_CFFI_OP_FUNCTION, 55), // void()(char const *, char *)
-/* 40 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
-/* 41 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 42 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 43 */ _CFFI_OP(_CFFI_OP_FUNCTION, 55), // void()(char const *, char *, int)
-/* 44 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
-/* 45 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 46 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7),
-/* 47 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 48 */ _CFFI_OP(_CFFI_OP_FUNCTION, 55), // void()(char const *, char const *, char *)
-/* 49 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
-/* 50 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
-/* 51 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 52 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 53 */ _CFFI_OP(_CFFI_OP_FUNCTION, 55), // void()(void)
-/* 54 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 55 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
+/* 32 */ _CFFI_OP(_CFFI_OP_FUNCTION, 51), // unsigned int()(void)
+/* 33 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 34 */ _CFFI_OP(_CFFI_OP_FUNCTION, 56), // void()(char *)
+/* 35 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 36 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 37 */ _CFFI_OP(_CFFI_OP_FUNCTION, 56), // void()(char *, char *)
+/* 38 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 39 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 40 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 41 */ _CFFI_OP(_CFFI_OP_FUNCTION, 56), // void()(char const *, char *)
+/* 42 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 43 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 44 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 45 */ _CFFI_OP(_CFFI_OP_FUNCTION, 56), // void()(char const *, char const *, char *)
+/* 46 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 47 */ _CFFI_OP(_CFFI_OP_NOOP, 8),
+/* 48 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 49 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 50 */ _CFFI_OP(_CFFI_OP_FUNCTION, 56), // void()(unsigned int, char *)
+/* 51 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8), // unsigned int
+/* 52 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 53 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 54 */ _CFFI_OP(_CFFI_OP_FUNCTION, 56), // void()(void)
+/* 55 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 56 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
 };
 
 static int _cffi_d_charInCad(char x0, char * x1)
@@ -873,34 +874,53 @@ _cffi_f_contarOcurrencias(PyObject *self, PyObject *args)
 #  define _cffi_f_contarOcurrencias _cffi_d_contarOcurrencias
 #endif
 
-static void _cffi_d_generarCadenaLetras(char const * x0, char * x1, int x2)
+static unsigned int _cffi_d_detener_temporizador(void)
 {
-  generarCadenaLetras(x0, x1, x2);
+  return detener_temporizador();
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_generarCadenaLetras(PyObject *self, PyObject *args)
+_cffi_f_detener_temporizador(PyObject *self, PyObject *noarg)
 {
-  char const * x0;
+  unsigned int result;
+  PyObject *pyresult;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = detener_temporizador(); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  (void)noarg; /* unused */
+  pyresult = _cffi_from_c_int(result, unsigned int);
+  return pyresult;
+}
+#else
+#  define _cffi_f_detener_temporizador _cffi_d_detener_temporizador
+#endif
+
+static void _cffi_d_formato_tiempo_mm_ss(unsigned int x0, char * x1)
+{
+  formato_tiempo_mm_ss(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_formato_tiempo_mm_ss(PyObject *self, PyObject *args)
+{
+  unsigned int x0;
   char * x1;
-  int x2;
   Py_ssize_t datasize;
   struct _cffi_freeme_s *large_args_free = NULL;
   PyObject *arg0;
   PyObject *arg1;
-  PyObject *arg2;
 
-  if (!PyArg_UnpackTuple(args, "generarCadenaLetras", 3, 3, &arg0, &arg1, &arg2))
+  if (!PyArg_UnpackTuple(args, "formato_tiempo_mm_ss", 2, 2, &arg0, &arg1))
     return NULL;
 
-  datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(8), arg0, (char **)&x0);
-  if (datasize != 0) {
-    x0 = ((size_t)datasize) <= 640 ? (char const *)alloca((size_t)datasize) : NULL;
-    if (_cffi_convert_array_argument(_cffi_type(8), arg0, (char **)&x0,
-            datasize, &large_args_free) < 0)
-      return NULL;
-  }
+  x0 = _cffi_to_c_int(arg0, unsigned int);
+  if (x0 == (unsigned int)-1 && PyErr_Occurred())
+    return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
       _cffi_type(1), arg1, (char **)&x1);
@@ -911,13 +931,9 @@ _cffi_f_generarCadenaLetras(PyObject *self, PyObject *args)
       return NULL;
   }
 
-  x2 = _cffi_to_c_int(arg2, int);
-  if (x2 == (int)-1 && PyErr_Occurred())
-    return NULL;
-
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { generarCadenaLetras(x0, x1, x2); }
+  { formato_tiempo_mm_ss(x0, x1); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
@@ -927,7 +943,31 @@ _cffi_f_generarCadenaLetras(PyObject *self, PyObject *args)
   return Py_None;
 }
 #else
-#  define _cffi_f_generarCadenaLetras _cffi_d_generarCadenaLetras
+#  define _cffi_f_formato_tiempo_mm_ss _cffi_d_formato_tiempo_mm_ss
+#endif
+
+static void _cffi_d_iniciar_temporizador(void)
+{
+  iniciar_temporizador();
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_iniciar_temporizador(PyObject *self, PyObject *noarg)
+{
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { iniciar_temporizador(); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  (void)noarg; /* unused */
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+#else
+#  define _cffi_f_iniciar_temporizador _cffi_d_iniciar_temporizador
 #endif
 
 static void _cffi_d_init_rand_seed(void)
@@ -1305,6 +1345,32 @@ _cffi_f_obtenerPista(PyObject *self, PyObject *args)
 #  define _cffi_f_obtenerPista _cffi_d_obtenerPista
 #endif
 
+static unsigned int _cffi_d_obtener_tiempo_actual(void)
+{
+  return obtener_tiempo_actual();
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_obtener_tiempo_actual(PyObject *self, PyObject *noarg)
+{
+  unsigned int result;
+  PyObject *pyresult;
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = obtener_tiempo_actual(); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  (void)noarg; /* unused */
+  pyresult = _cffi_from_c_int(result, unsigned int);
+  return pyresult;
+}
+#else
+#  define _cffi_f_obtener_tiempo_actual _cffi_d_obtener_tiempo_actual
+#endif
+
 static int _cffi_d_rnd(int x0)
 {
   return rnd(x0);
@@ -1341,15 +1407,18 @@ static const struct _cffi_global_s _cffi_globals[] = {
   { "cmpCadIgnoreCase", (void *)_cffi_f_cmpCadIgnoreCase, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 12), (void *)_cffi_d_cmpCadIgnoreCase },
   { "contarLineas", (void *)_cffi_f_contarLineas, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 0), (void *)_cffi_d_contarLineas },
   { "contarOcurrencias", (void *)_cffi_f_contarOcurrencias, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 20), (void *)_cffi_d_contarOcurrencias },
-  { "generarCadenaLetras", (void *)_cffi_f_generarCadenaLetras, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 43), (void *)_cffi_d_generarCadenaLetras },
-  { "init_rand_seed", (void *)_cffi_f_init_rand_seed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 53), (void *)_cffi_d_init_rand_seed },
+  { "detener_temporizador", (void *)_cffi_f_detener_temporizador, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 32), (void *)_cffi_d_detener_temporizador },
+  { "formato_tiempo_mm_ss", (void *)_cffi_f_formato_tiempo_mm_ss, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 50), (void *)_cffi_d_formato_tiempo_mm_ss },
+  { "iniciar_temporizador", (void *)_cffi_f_iniciar_temporizador, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 54), (void *)_cffi_d_iniciar_temporizador },
+  { "init_rand_seed", (void *)_cffi_f_init_rand_seed, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 54), (void *)_cffi_d_init_rand_seed },
   { "leerArchivo", (void *)_cffi_f_leerArchivo, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 7), (void *)_cffi_d_leerArchivo },
   { "lenCad", (void *)_cffi_f_lenCad, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 0), (void *)_cffi_d_lenCad },
   { "letraEnPosicion", (void *)_cffi_f_letraEnPosicion, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 24), (void *)_cffi_d_letraEnPosicion },
-  { "letrasUnicas", (void *)_cffi_f_letrasUnicas, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 39), (void *)_cffi_d_letrasUnicas },
-  { "mezclarCadena", (void *)_cffi_f_mezclarCadena, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 32), (void *)_cffi_d_mezclarCadena },
-  { "obtenerLineaRandom", (void *)_cffi_f_obtenerLineaRandom, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 35), (void *)_cffi_d_obtenerLineaRandom },
-  { "obtenerPista", (void *)_cffi_f_obtenerPista, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 48), (void *)_cffi_d_obtenerPista },
+  { "letrasUnicas", (void *)_cffi_f_letrasUnicas, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 41), (void *)_cffi_d_letrasUnicas },
+  { "mezclarCadena", (void *)_cffi_f_mezclarCadena, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 34), (void *)_cffi_d_mezclarCadena },
+  { "obtenerLineaRandom", (void *)_cffi_f_obtenerLineaRandom, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 37), (void *)_cffi_d_obtenerLineaRandom },
+  { "obtenerPista", (void *)_cffi_f_obtenerPista, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 45), (void *)_cffi_d_obtenerPista },
+  { "obtener_tiempo_actual", (void *)_cffi_f_obtener_tiempo_actual, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_N, 32), (void *)_cffi_d_obtener_tiempo_actual },
   { "rnd", (void *)_cffi_f_rnd, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 29), (void *)_cffi_d_rnd },
 };
 
@@ -1360,12 +1429,12 @@ static const struct _cffi_type_context_s _cffi_type_context = {
   NULL,  /* no struct_unions */
   NULL,  /* no enums */
   NULL,  /* no typenames */
-  15,  /* num_globals */
+  18,  /* num_globals */
   0,  /* num_struct_unions */
   0,  /* num_enums */
   0,  /* num_typenames */
   NULL,  /* no includes */
-  56,  /* num_types */
+  57,  /* num_types */
   0,  /* flags */
 };
 

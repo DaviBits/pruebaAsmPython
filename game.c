@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>   
+#include <Windows.h>
 static unsigned int global_seed = 0;
+static DWORD tiempo_inicio = 0;
+static DWORD tiempo_total = 0;
+
 int rnd(int max);
 int cmpCad(char cad1[], char cad2[]);
 int charInCad(char car, char cad[]);
@@ -16,29 +20,134 @@ int contarOcurrencias(char letra, const char* palabra);
 void obtenerPista(const char* palabra, const char* palabraOculta, char* resultado);
 int cmpCadIgnoreCase(const char* cad1, const char* cad2);
 void letrasUnicas(const char* palabra, char* resultado);
+void iniciar_temporizador();
+DWORD detener_temporizador();
+DWORD obtener_tiempo_actual();
+void formato_tiempo_mm_ss(DWORD ms, char* buffer);
+
 
 void init_rand_seed() {
     global_seed = (unsigned int)time(NULL) ^ (unsigned int)getpid();
 }
 
-int rnd(int max){
-    int selected = 0;
-    
-    __asm{
-        mov eax, global_seed
-        imul eax, 1664525
-        add eax, 1013904223
-        mov global_seed, eax 
-
-        mov ecx, max
-        mov edx, 0       ; ← FIX IMPORTANTE
-        div ecx            ; edx = eax % max
-
-        mov selected, edx
+void iniciar_temporizador() {
+    __asm {
+        call GetTickCount      ; Llama a la función de Windows
+        mov tiempo_inicio, eax ; Guarda el tiempo de inicio
     }
-
-    return selected;
 }
+
+// ============================================
+// 2. DETENER TEMPORIZADOR Y OBTENER TIEMPO
+// ============================================
+DWORD detener_temporizador() {
+    DWORD tiempo_transcurrido;
+    
+    __asm {
+        call GetTickCount          ; Obtiene tiempo actual
+        sub eax, tiempo_inicio     ; Resta tiempo de inicio
+        mov tiempo_transcurrido, eax ; Guarda resultado
+        
+        ; Opcional: sumar al tiempo total
+        add tiempo_total, eax
+    }
+    
+    return tiempo_transcurrido;  // Milisegundos
+}
+
+// ============================================
+// 3. OBTENER TIEMPO ACTUAL SIN DETENER
+// ============================================
+DWORD obtener_tiempo_actual() {
+    DWORD tiempo_actual;
+    
+    __asm {
+        call GetTickCount
+        sub eax, tiempo_inicio
+        mov tiempo_actual, eax
+    }
+    
+    return tiempo_actual;
+}
+
+// ============================================
+// 4. FUNCIÓN PARA FORMATO "MM:SS"
+// ============================================
+void formato_tiempo_mm_ss(DWORD ms, char* buffer) {
+    __asm {
+        push ebx
+        push esi
+        push edi
+        
+        mov eax, ms           ; Milisegundos a convertir
+        mov edi, buffer       ; Buffer de salida
+        
+        ; ---- CALCULAR MINUTOS ----
+        ; minutos = ms / 60000
+        xor edx, edx
+        mov ecx, 60000        ; 60 segundos * 1000 ms
+        div ecx               ; EAX = minutos, EDX = ms restantes
+        
+        ; Formatear minutos (2 dígitos)
+        mov bl, 10
+        div bl                ; AL = decenas, AH = unidades
+        
+        add al, '0'
+        mov [edi], al         ; Primer dígito
+        add ah, '0'
+        mov [edi+1], ah       ; Segundo dígito
+        mov byte ptr [edi+2], ':' ; Separador
+        
+        ; ---- CALCULAR SEGUNDOS ----
+        ; segundos = ms_restantes / 1000
+        mov eax, edx          ; ms restantes
+        xor edx, edx
+        mov ecx, 1000
+        div ecx               ; EAX = segundos
+        
+        ; Formatear segundos (2 dígitos)
+        mov bl, 10
+        div bl
+        
+        add al, '0'
+        mov [edi+3], al       ; Primer dígito segundos
+        add ah, '0'
+        mov [edi+4], ah       ; Segundo dígito segundos
+        mov byte ptr [edi+5], 0 ; Null terminator
+        
+        pop edi
+        pop esi
+        pop ebx
+    }
+}
+
+int rnd(int max){
+     int resultado;
+    
+    __asm {
+        // Llamar a GetTickCount
+        call GetTickCount  ; EAX = milisegundos desde boot
+        
+        // Usar como semilla para generador aleatorio
+        mov ecx, 1664525
+        imul ecx          ; EDX:EAX = EAX * ECX
+        add eax, 1013904223
+        
+        // Aplicar módulo
+        xor edx, edx
+        mov ecx, max
+        test ecx, ecx
+        jz fin
+        div ecx           ; EDX = EAX % ECX
+        mov resultado, edx
+        jmp fin
+        
+        fin:
+    }
+    
+    return resultado;
+}
+
 int cmpCad(char cad1[], char cad2[]) { 
     int esLaMisma = 1;
 
